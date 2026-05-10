@@ -2,381 +2,540 @@
 <html lang="fr">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Planning Présentoirs — Chelles | BeluSoft-Tchapy</title>
-<link rel="manifest" href="data:application/manifest+json;base64,eyJuYW1lIjoiUHJlc2VudG9pcnMgQ2hlbGxlcyIsInNob3J0X25hbWUiOiJQcmVzZW50b2lycyIsInN0YXJ0X3VybCI6Ii4iLCJkaXNwbGF5Ijoic3RhbmRhbG9uZSIsInRoZW1lX2NvbG9yIjoiIzFlM2E4YSIsImJhY2tncm91bmRfY29sb3IiOiIjZjNmNGY2IiwiaWNvbnMiOltdfQ==">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<meta name="theme-color" content="#1e3a8a">
+<title>Présentoirs Chelles V2 · BeluSoft-Tchapy</title>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin="">
 <style>
 :root{
-  --primary:#1e3a8a; --primary-light:#3b82f6; --primary-dark:#1e40af;
-  --accent:#f59e0b; --accent-dark:#d97706;
-  --success:#10b981; --danger:#ef4444; --warning:#f59e0b;
-  --bg:#f3f4f6; --surface:#ffffff; --surface-2:#f9fafb;
-  --text:#111827; --text-muted:#6b7280; --border:#e5e7eb;
-  --radius:10px; --shadow:0 1px 3px rgba(0,0,0,.08),0 1px 2px rgba(0,0,0,.06);
-  --shadow-lg:0 10px 15px -3px rgba(0,0,0,.1),0 4px 6px -2px rgba(0,0,0,.05);
+  --p:#1e3a8a;--pl:#3b82f6;--pd:#1e40af;--ac:#f59e0b;--acd:#d97706;
+  --ok:#10b981;--ko:#ef4444;--wn:#f59e0b;
+  --bg:#f3f4f6;--sf:#fff;--sf2:#f9fafb;--tx:#111827;--mu:#6b7280;--bd:#e5e7eb;
+  --r:10px;--sh:0 1px 3px rgba(0,0,0,.08);--shl:0 8px 20px -4px rgba(0,0,0,.15);
 }
 *{box-sizing:border-box;margin:0;padding:0}
-body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:var(--bg);color:var(--text);line-height:1.5;min-height:100vh}
-header{background:linear-gradient(135deg,var(--primary) 0%,var(--primary-light) 100%);color:#fff;padding:16px 20px;box-shadow:var(--shadow-lg);position:sticky;top:0;z-index:100}
-header .h-wrap{max-width:1400px;margin:0 auto;display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}
-header h1{font-size:1.25rem;font-weight:700;display:flex;align-items:center;gap:10px}
-header h1 .logo{background:#fff;color:var(--primary);width:36px;height:36px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-weight:800}
-header .sub{font-size:.75rem;opacity:.9;font-weight:400;margin-left:46px;display:block;margin-top:-4px}
-header .h-actions{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
-.btn{background:var(--primary);color:#fff;border:none;padding:8px 14px;border-radius:var(--radius);font-size:.875rem;font-weight:600;cursor:pointer;transition:all .15s;display:inline-flex;align-items:center;gap:6px}
-.btn:hover{background:var(--primary-dark);transform:translateY(-1px)}
-.btn:active{transform:translateY(0)}
-.btn:disabled{opacity:.5;cursor:not-allowed;transform:none}
-.btn-sm{padding:5px 10px;font-size:.8rem}
-.btn-accent{background:var(--accent)}.btn-accent:hover{background:var(--accent-dark)}
-.btn-success{background:var(--success)}.btn-success:hover{background:#059669}
-.btn-danger{background:var(--danger)}.btn-danger:hover{background:#dc2626}
-.btn-ghost{background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.25)}
-.btn-ghost:hover{background:rgba(255,255,255,.25)}
-.btn-outline{background:transparent;border:1.5px solid var(--primary);color:var(--primary)}
-.btn-outline:hover{background:var(--primary);color:#fff}
+html,body{height:100%}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:var(--bg);color:var(--tx);line-height:1.45;font-size:14px;-webkit-tap-highlight-color:transparent}
 
-main{max-width:1400px;margin:0 auto;padding:20px;display:grid;grid-template-columns:1fr 340px;gap:20px}
-@media(max-width:1024px){main{grid-template-columns:1fr}}
+/* HEADER */
+header{background:linear-gradient(135deg,var(--p),var(--pl));color:#fff;padding:10px 14px;box-shadow:var(--shl);position:sticky;top:0;z-index:100}
+.h-wrap{max-width:1400px;margin:0 auto;display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap}
+.h-title{display:flex;align-items:center;gap:10px}
+.h-title h1{font-size:1.05rem;font-weight:700}
+.h-title .logo{background:#fff;color:var(--p);width:34px;height:34px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:1.1rem}
+.h-title .sub{font-size:.7rem;opacity:.9;display:block;line-height:1}
+.h-actions{display:flex;gap:6px;align-items:center;flex-wrap:wrap}
+.h-actions .pill{font-size:.7rem;padding:3px 8px;border-radius:10px;background:rgba(255,255,255,.18);display:inline-flex;gap:4px;align-items:center}
+.h-actions .pill .dot{width:7px;height:7px;border-radius:50%;background:var(--ko);display:inline-block}
+.h-actions .pill .dot.on{background:var(--ok)}
 
-.card{background:var(--surface);border-radius:var(--radius);padding:16px;box-shadow:var(--shadow);margin-bottom:16px}
-.card h2{font-size:1rem;font-weight:700;color:var(--primary);margin-bottom:12px;padding-bottom:8px;border-bottom:2px solid var(--border);display:flex;align-items:center;gap:8px}
-.card h3{font-size:.9rem;font-weight:600;color:var(--text);margin:10px 0 6px}
+/* NAV */
+nav.tabs{background:#fff;border-bottom:1px solid var(--bd);overflow-x:auto;scrollbar-width:none;position:sticky;top:54px;z-index:99}
+nav.tabs::-webkit-scrollbar{display:none}
+nav.tabs .inner{display:flex;max-width:1400px;margin:0 auto;padding:0 8px}
+nav.tabs button{background:none;border:none;padding:11px 14px;font-size:.82rem;font-weight:600;color:var(--mu);cursor:pointer;border-bottom:3px solid transparent;white-space:nowrap;display:flex;align-items:center;gap:5px;font-family:inherit}
+nav.tabs button.active{color:var(--p);border-bottom-color:var(--p)}
+nav.tabs button:hover{color:var(--tx)}
+nav.tabs button .ico{font-size:1rem}
 
-/* ====== Sélection mois/jour ====== */
-.selector-row{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px}
-.selector-row label{display:block;font-size:.75rem;font-weight:600;color:var(--text-muted);margin-bottom:4px;text-transform:uppercase;letter-spacing:.04em}
-select,input[type="text"],input[type="password"]{width:100%;padding:8px 10px;border:1.5px solid var(--border);border-radius:8px;font-size:.9rem;background:var(--surface);color:var(--text);font-family:inherit}
-select:focus,input:focus{outline:none;border-color:var(--primary-light);box-shadow:0 0 0 3px rgba(59,130,246,.15)}
+/* MAIN */
+main{max-width:1400px;margin:0 auto;padding:14px}
+.screen{display:none;animation:fadeIn .2s}
+.screen.active{display:block}
+@keyframes fadeIn{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
 
-.days-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;margin-top:10px}
-.day-cell{aspect-ratio:1;border:1.5px solid var(--border);border-radius:6px;display:flex;flex-direction:column;align-items:center;justify-content:center;font-size:.85rem;font-weight:600;cursor:pointer;background:var(--surface);transition:all .1s;position:relative;padding:2px}
-.day-cell:hover{border-color:var(--primary-light);background:var(--surface-2)}
-.day-cell.selected{background:var(--primary);color:#fff;border-color:var(--primary)}
-.day-cell.has-res{background:#fef3c7;border-color:var(--accent)}
-.day-cell.has-res.selected{background:var(--primary);color:#fff}
-.day-cell.disabled{opacity:.3;cursor:not-allowed;pointer-events:none}
-.day-cell .badge{font-size:.6rem;background:var(--accent);color:#fff;border-radius:10px;padding:0 5px;min-width:16px;text-align:center;margin-top:1px;font-weight:700}
-.day-cell.selected .badge{background:#fff;color:var(--primary)}
-.dow-row{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;margin-bottom:4px}
-.dow{text-align:center;font-size:.7rem;font-weight:700;color:var(--text-muted);text-transform:uppercase}
-.dow.we{color:var(--danger)}
+/* CARDS */
+.card{background:var(--sf);border-radius:var(--r);padding:14px;box-shadow:var(--sh);margin-bottom:12px}
+.card h2{font-size:.95rem;font-weight:700;color:var(--p);margin-bottom:10px;padding-bottom:6px;border-bottom:2px solid var(--bd);display:flex;align-items:center;gap:6px;justify-content:space-between}
+.card h2 .ttl{display:flex;align-items:center;gap:6px}
+.card h3{font-size:.85rem;font-weight:600;margin:8px 0 4px;color:var(--tx)}
 
-/* ====== Créneaux / Réservations ====== */
-.empl-row{display:flex;justify-content:space-between;align-items:center;padding:8px 10px;border:1px solid var(--border);border-radius:8px;margin-bottom:6px;background:var(--surface-2);cursor:pointer;transition:all .1s;font-size:.875rem}
-.empl-row:hover{border-color:var(--primary-light);background:#eff6ff}
-.empl-row.active{border-color:var(--primary);background:#dbeafe;font-weight:600}
-.empl-row .count{background:var(--primary);color:#fff;font-size:.7rem;padding:2px 8px;border-radius:12px;font-weight:700}
-.empl-row .count.zero{background:var(--border);color:var(--text-muted)}
+.grid-2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.grid-3{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.grid-4{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+@media(max-width:768px){.grid-2,.grid-3,.grid-4{grid-template-columns:1fr 1fr}}
 
-.slot-list{margin-top:12px}
-.slot{display:grid;grid-template-columns:70px 1fr auto;align-items:center;gap:10px;padding:8px 10px;border:1px solid var(--border);border-radius:8px;margin-bottom:5px;background:var(--surface)}
-.slot.has-proc{background:#ecfdf5;border-color:#a7f3d0}
-.slot .time{font-weight:700;color:var(--primary);font-size:.95rem;font-family:'SF Mono',Monaco,monospace}
-.slot .procs{display:flex;flex-wrap:wrap;gap:4px}
-.proc-chip{background:var(--primary);color:#fff;padding:2px 8px;border-radius:10px;font-size:.75rem;display:inline-flex;align-items:center;gap:4px;font-weight:500}
-.proc-chip .x{cursor:pointer;opacity:.7;font-weight:700;padding:0 2px}
-.proc-chip .x:hover{opacity:1}
-.slot .actions{display:flex;gap:4px}
+/* BUTTONS */
+.btn{background:var(--p);color:#fff;border:none;padding:7px 12px;border-radius:8px;font-size:.82rem;font-weight:600;cursor:pointer;transition:all .12s;display:inline-flex;align-items:center;gap:5px;font-family:inherit}
+.btn:hover{background:var(--pd);transform:translateY(-1px)}
+.btn:active{transform:none}
+.btn:disabled{opacity:.45;cursor:not-allowed;transform:none}
+.btn.sm{padding:4px 9px;font-size:.74rem}
+.btn.ac{background:var(--ac)}.btn.ac:hover{background:var(--acd)}
+.btn.ok{background:var(--ok)}.btn.ok:hover{background:#059669}
+.btn.ko{background:var(--ko)}.btn.ko:hover{background:#dc2626}
+.btn.gh{background:rgba(255,255,255,.18);color:#fff}.btn.gh:hover{background:rgba(255,255,255,.28)}
+.btn.out{background:transparent;border:1.5px solid var(--p);color:var(--p)}.btn.out:hover{background:var(--p);color:#fff}
+.btn.w{width:100%;justify-content:center}
 
-.empl-legend{font-size:.75rem;color:var(--text-muted);margin-top:8px;padding:6px;background:var(--surface-2);border-radius:6px;display:flex;gap:12px;flex-wrap:wrap}
-.empl-legend span{display:inline-flex;align-items:center;gap:4px}
-.empl-legend .dot{width:10px;height:10px;border-radius:3px;display:inline-block}
+/* FORMS */
+.fld{margin-bottom:8px}
+.fld label{display:block;font-size:.7rem;font-weight:600;color:var(--mu);text-transform:uppercase;letter-spacing:.04em;margin-bottom:3px}
+.fld input,.fld select,.fld textarea{width:100%;padding:7px 9px;border:1.5px solid var(--bd);border-radius:7px;font-size:.85rem;background:var(--sf);color:var(--tx);font-family:inherit}
+.fld input:focus,.fld select:focus,.fld textarea:focus{outline:none;border-color:var(--pl);box-shadow:0 0 0 3px rgba(59,130,246,.15)}
+.fld textarea{min-height:60px;resize:vertical}
 
-/* ====== Chronomètre ====== */
-.chrono-wrap{background:linear-gradient(135deg,#1e293b 0%,#0f172a 100%);color:#fff;border-radius:var(--radius);padding:16px;text-align:center;margin-bottom:16px}
-.chrono-wrap h2{color:#fff;border-bottom-color:rgba(255,255,255,.15);display:flex;justify-content:center;gap:8px}
-.chrono-display{font-size:3.5rem;font-weight:800;font-family:'SF Mono',Monaco,monospace;letter-spacing:-.02em;margin:8px 0;text-shadow:0 0 20px rgba(245,158,11,.3);line-height:1}
-.chrono-display.warning{color:#fbbf24;animation:pulse 1s infinite}
-.chrono-display.critical{color:#f87171;animation:pulse .5s infinite}
-.chrono-label{font-size:.75rem;opacity:.7;text-transform:uppercase;letter-spacing:.1em}
-@keyframes pulse{0%,100%{opacity:1}50%{opacity:.6}}
-.chrono-ctx{background:rgba(255,255,255,.08);border-radius:8px;padding:8px;margin:8px 0;font-size:.8rem}
-.chrono-ctx .label{opacity:.7;font-size:.7rem;text-transform:uppercase}
-.chrono-ctx .value{font-weight:600;margin-top:2px}
-.chrono-actions{display:flex;gap:6px;justify-content:center;flex-wrap:wrap;margin-top:10px}
+/* CALENDRIER */
+.cal-head{display:grid;grid-template-columns:repeat(7,1fr);gap:3px;margin-bottom:3px}
+.cal-head div{text-align:center;font-size:.65rem;font-weight:700;color:var(--mu);text-transform:uppercase}
+.cal-head div.we{color:var(--ko)}
+.cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:3px}
+.cal-day{aspect-ratio:1;border:1.5px solid var(--bd);border-radius:6px;display:flex;flex-direction:column;align-items:center;justify-content:center;font-size:.85rem;font-weight:600;cursor:pointer;background:var(--sf);transition:.1s;position:relative;padding:1px}
+.cal-day:hover:not(.disabled){border-color:var(--pl);background:var(--sf2)}
+.cal-day.sel{background:var(--p);color:#fff;border-color:var(--p)}
+.cal-day.has{background:#fef3c7;border-color:var(--ac)}
+.cal-day.has.sel{background:var(--p);color:#fff}
+.cal-day.disabled{opacity:.25;cursor:default;pointer-events:none}
+.cal-day .b{font-size:.55rem;background:var(--ac);color:#fff;border-radius:8px;padding:0 5px;min-width:14px;text-align:center;margin-top:1px;font-weight:700}
+.cal-day.sel .b{background:#fff;color:var(--p)}
+.cal-day.today{box-shadow:0 0 0 2px var(--ac)}
 
-/* ====== Auth / Admin ====== */
-.auth-bar{background:var(--surface);border-radius:var(--radius);padding:10px 14px;margin-bottom:16px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;box-shadow:var(--shadow)}
-.auth-bar .status{display:flex;align-items:center;gap:6px;font-size:.85rem}
-.auth-bar .dot{width:10px;height:10px;border-radius:50%;background:var(--danger)}
-.auth-bar .dot.on{background:var(--success)}
+/* SELECTORS */
+.sel-row{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:10px}
+@media(max-width:560px){.sel-row{grid-template-columns:1fr 1fr}}
 
-/* ====== Stats ====== */
-.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:12px}
-.stat{background:var(--surface-2);padding:8px;border-radius:8px;text-align:center;border:1px solid var(--border)}
-.stat .num{font-size:1.3rem;font-weight:800;color:var(--primary);line-height:1}
-.stat .lbl{font-size:.7rem;color:var(--text-muted);text-transform:uppercase;margin-top:2px;font-weight:600}
+/* STATS */
+.stat{background:var(--sf2);padding:10px;border-radius:8px;text-align:center;border:1px solid var(--bd)}
+.stat .num{font-size:1.4rem;font-weight:800;color:var(--p);line-height:1}
+.stat .lbl{font-size:.65rem;color:var(--mu);text-transform:uppercase;margin-top:3px;font-weight:700;letter-spacing:.04em}
+.stat.acc .num{color:var(--ac)}
+.stat.ok .num{color:var(--ok)}
+.stat.ko .num{color:var(--ko)}
 
-/* ====== Modal ====== */
-.modal{display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:1000;justify-content:center;align-items:flex-start;padding:40px 20px;overflow-y:auto}
+/* LISTS */
+.row{display:flex;justify-content:space-between;align-items:center;padding:7px 9px;border:1px solid var(--bd);border-radius:7px;margin-bottom:4px;background:var(--sf);font-size:.82rem;cursor:pointer;transition:.1s}
+.row:hover:not(.no-hover){border-color:var(--pl);background:#eff6ff}
+.row.active{border-color:var(--p);background:#dbeafe;font-weight:600}
+.row .cnt{background:var(--p);color:#fff;font-size:.65rem;padding:2px 7px;border-radius:10px;font-weight:700;white-space:nowrap}
+.row .cnt.zero{background:var(--bd);color:var(--mu)}
+.row .cnt.ok{background:var(--ok)}
+
+/* SLOT */
+.slot{display:grid;grid-template-columns:60px 1fr auto;align-items:center;gap:8px;padding:6px 9px;border:1px solid var(--bd);border-radius:7px;margin-bottom:4px;background:var(--sf);font-size:.8rem}
+.slot.has{background:#ecfdf5;border-color:#a7f3d0}
+.slot .t{font-weight:700;color:var(--p);font-family:'SF Mono',Menlo,monospace}
+.slot .ps{display:flex;flex-wrap:wrap;gap:3px}
+.slot .a{display:flex;gap:3px}
+.chip{background:var(--p);color:#fff;padding:2px 7px;border-radius:9px;font-size:.7rem;display:inline-flex;align-items:center;gap:3px;font-weight:500}
+.chip .x{cursor:pointer;opacity:.7;font-weight:700;padding:0 1px}
+.chip .x:hover{opacity:1}
+@media(max-width:560px){.slot{grid-template-columns:50px 1fr;gap:6px}.slot .a{grid-column:1/-1;justify-content:flex-end}}
+
+/* SEARCH */
+.search{width:100%;padding:7px 11px;border:1.5px solid var(--bd);border-radius:8px;font-size:.85rem;margin-bottom:8px;font-family:inherit}
+
+/* PROC GRID */
+.pgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(125px,1fr));gap:4px;max-height:340px;overflow-y:auto;border:1px solid var(--bd);border-radius:8px;padding:6px;background:var(--sf2)}
+.pbtn{background:var(--sf);border:1.5px solid var(--bd);border-radius:6px;padding:4px 7px;font-size:.75rem;cursor:pointer;text-align:left;font-family:inherit;transition:.08s}
+.pbtn:hover{border-color:var(--pl);background:#eff6ff}
+.pbtn.sel{background:var(--p);color:#fff;border-color:var(--p)}
+.pbtn.dis{opacity:.5;cursor:not-allowed}
+.pbtn .sub{font-size:.65rem;opacity:.7;display:block}
+
+/* CHRONO */
+.chrono{background:linear-gradient(135deg,#1e293b,#0f172a);color:#fff;border-radius:var(--r);padding:14px;text-align:center;margin-bottom:12px;position:relative;overflow:hidden}
+.chrono h2{color:#fff;border-bottom-color:rgba(255,255,255,.12);justify-content:center}
+.chrono-phase{font-size:.7rem;text-transform:uppercase;letter-spacing:.15em;opacity:.7;margin-bottom:4px}
+.chrono-phase.prep{color:#fbbf24}
+.chrono-phase.run{color:#10b981}
+.chrono-phase.end{color:#f87171}
+.chrono-ctx{background:rgba(255,255,255,.08);border-radius:7px;padding:6px;margin:6px 0;font-size:.75rem}
+.chrono-ctx .lab{opacity:.65;font-size:.62rem;text-transform:uppercase}
+.chrono-ctx .v{font-weight:600;margin-top:1px}
+.chrono-d{font-size:3.2rem;font-weight:800;font-family:'SF Mono',Menlo,monospace;letter-spacing:-.03em;line-height:1;margin:6px 0;text-shadow:0 0 18px rgba(245,158,11,.25)}
+.chrono-d.warn{color:#fbbf24;animation:pulse 1s infinite}
+.chrono-d.crit{color:#f87171;animation:pulse .5s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.55}}
+.chrono-bar{height:6px;background:rgba(255,255,255,.1);border-radius:3px;margin:6px 0;overflow:hidden}
+.chrono-bar .fill{height:100%;background:linear-gradient(90deg,var(--ok),var(--ac));border-radius:3px;transition:width .25s linear}
+.chrono-a{display:flex;gap:5px;justify-content:center;flex-wrap:wrap;margin-top:8px}
+.chrono-tip{font-size:.65rem;opacity:.55;margin-top:6px}
+
+/* MAP */
+#mapView{height:480px;border-radius:8px;border:1px solid var(--bd)}
+@media(max-width:768px){#mapView{height:380px}}
+
+/* MODAL */
+.modal{display:none;position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:1000;justify-content:center;align-items:flex-start;padding:30px 14px;overflow-y:auto}
 .modal.open{display:flex}
-.modal-content{background:var(--surface);border-radius:12px;padding:20px;width:100%;max-width:500px;box-shadow:var(--shadow-lg);max-height:90vh;overflow-y:auto}
-.modal-content h3{font-size:1.05rem;color:var(--primary);margin-bottom:12px;display:flex;justify-content:space-between;align-items:center}
-.modal-content .close{background:none;border:none;font-size:1.5rem;cursor:pointer;color:var(--text-muted);line-height:1;padding:0 4px}
-.modal-content .close:hover{color:var(--danger)}
+.modal-c{background:var(--sf);border-radius:12px;padding:16px;width:100%;max-width:480px;box-shadow:var(--shl);max-height:90vh;overflow-y:auto}
+.modal-c h3{font-size:1rem;color:var(--p);margin-bottom:10px;display:flex;justify-content:space-between;align-items:center}
+.modal-c .cl{background:none;border:none;font-size:1.4rem;cursor:pointer;color:var(--mu);line-height:1}
+.modal-c .cl:hover{color:var(--ko)}
 
-.field{margin-bottom:10px}
-.field label{display:block;font-size:.8rem;font-weight:600;margin-bottom:4px;color:var(--text-muted);text-transform:uppercase;letter-spacing:.04em}
+/* TOAST */
+.toast{position:fixed;bottom:14px;left:50%;transform:translate(-50%,120%);background:var(--tx);color:#fff;padding:9px 15px;border-radius:8px;box-shadow:var(--shl);z-index:2000;font-size:.83rem;transition:transform .3s;max-width:90vw;text-align:center;font-weight:500}
+.toast.show{transform:translate(-50%,0)}
+.toast.ok{background:var(--ok)}.toast.ko{background:var(--ko)}.toast.wn{background:var(--ac)}
 
-.proc-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:4px;max-height:300px;overflow-y:auto;border:1px solid var(--border);border-radius:8px;padding:8px;background:var(--surface-2)}
-.proc-btn{background:var(--surface);border:1.5px solid var(--border);border-radius:6px;padding:5px 8px;font-size:.8rem;cursor:pointer;text-align:left;transition:all .1s}
-.proc-btn:hover{border-color:var(--primary-light);background:#eff6ff}
-.proc-btn.selected{background:var(--primary);color:#fff;border-color:var(--primary)}
-.proc-btn.disabled{opacity:.5;cursor:not-allowed}
+/* MISC */
+.muted{color:var(--mu);font-size:.78rem;font-style:italic}
+.hidden{display:none!important}
+.tag{display:inline-block;padding:1px 6px;border-radius:8px;font-size:.65rem;font-weight:600;background:var(--sf2);border:1px solid var(--bd)}
+.tag.ok{background:#d1fae5;border-color:#a7f3d0;color:#065f46}
+.tag.ko{background:#fee2e2;border-color:#fecaca;color:#991b1b}
+.tag.wn{background:#fef3c7;border-color:#fde68a;color:#92400e}
+.divider{border:none;border-top:1px solid var(--bd);margin:10px 0}
 
-.search-box{width:100%;padding:6px 10px;border:1.5px solid var(--border);border-radius:8px;margin-bottom:8px;font-size:.85rem}
+/* TABLE */
+table.t{width:100%;border-collapse:collapse;font-size:.78rem}
+table.t th,table.t td{text-align:left;padding:6px 8px;border-bottom:1px solid var(--bd)}
+table.t th{background:var(--sf2);color:var(--mu);text-transform:uppercase;font-size:.65rem;font-weight:700;letter-spacing:.04em;cursor:pointer;user-select:none}
+table.t th:hover{background:var(--bd)}
+table.t tr:hover{background:#eff6ff}
+table.t td.num{text-align:right;font-variant-numeric:tabular-nums;font-weight:600}
 
-/* ====== Toast ====== */
-.toast{position:fixed;bottom:20px;right:20px;background:var(--text);color:#fff;padding:10px 16px;border-radius:8px;box-shadow:var(--shadow-lg);z-index:2000;font-size:.85rem;transform:translateY(120%);transition:transform .3s;max-width:360px}
-.toast.show{transform:translateY(0)}
-.toast.success{background:var(--success)}
-.toast.error{background:var(--danger)}
-.toast.warning{background:var(--accent)}
+/* RGPD note */
+.rgpd-note{font-size:.7rem;color:var(--mu);background:#eff6ff;border-left:3px solid var(--pl);padding:5px 9px;border-radius:0 5px 5px 0;margin:6px 0}
 
-/* ====== Footer / Signature ====== */
-footer{text-align:center;padding:20px;font-size:.75rem;color:var(--text-muted)}
-footer a{color:var(--primary);text-decoration:none}
+/* FOOTER */
+footer{text-align:center;padding:14px;font-size:.7rem;color:var(--mu)}
+footer a{color:var(--p);text-decoration:none}
 
-/* ====== Responsive ====== */
-@media(max-width:768px){
-  main{padding:12px;gap:12px}
-  header h1{font-size:1.05rem}
-  .chrono-display{font-size:2.8rem}
-  .slot{grid-template-columns:60px 1fr;gap:6px}
-  .slot .actions{grid-column:1/-1;justify-content:flex-end}
-  .stats{grid-template-columns:repeat(3,1fr)}
-  .stat .num{font-size:1.05rem}
-  .proc-grid{grid-template-columns:repeat(2,1fr)}
-}
+.empty{text-align:center;padding:24px;color:var(--mu);font-style:italic;font-size:.83rem}
 
-.tabs{display:flex;gap:4px;margin-bottom:12px;border-bottom:2px solid var(--border)}
-.tab{background:none;border:none;padding:8px 14px;font-size:.85rem;font-weight:600;cursor:pointer;color:var(--text-muted);border-bottom:3px solid transparent;margin-bottom:-2px}
-.tab.active{color:var(--primary);border-bottom-color:var(--primary)}
-.tab:hover{color:var(--text)}
+/* MAP popup */
+.leaflet-popup-content{font-size:.78rem;line-height:1.4}
+.leaflet-popup-content b{color:var(--p)}
 
-.hidden{display:none !important}
-
-.pill{display:inline-block;padding:2px 8px;border-radius:10px;font-size:.7rem;font-weight:600;background:var(--surface-2);border:1px solid var(--border)}
-.pill.ok{background:#d1fae5;border-color:#a7f3d0;color:#065f46}
-.pill.full{background:#fee2e2;border-color:#fecaca;color:#991b1b}
-
-.rgpd-tip{font-size:.7rem;color:var(--text-muted);font-style:italic;margin-top:4px}
+/* SCROLLBARS */
+::-webkit-scrollbar{width:8px;height:8px}
+::-webkit-scrollbar-track{background:var(--sf2)}
+::-webkit-scrollbar-thumb{background:var(--bd);border-radius:4px}
+::-webkit-scrollbar-thumb:hover{background:var(--mu)}
 </style>
 </head>
 <body>
 
 <header>
   <div class="h-wrap">
-    <div>
-      <h1><span class="logo">📍</span> Planning Présentoirs</h1>
-      <span class="sub">Chelles — BeluSoft-Tchapy © 2026</span>
+    <div class="h-title">
+      <span class="logo">📍</span>
+      <div>
+        <h1>Présentoirs Chelles</h1>
+        <span class="sub">BeluSoft-Tchapy © 2026 · V2</span>
+      </div>
     </div>
     <div class="h-actions">
-      <button class="btn btn-ghost btn-sm" onclick="openModal('modalHelp')">❓ Aide</button>
-      <button class="btn btn-ghost btn-sm" onclick="openModal('modalSettings')">⚙️ Réglages</button>
-      <button class="btn btn-accent btn-sm" id="btnSaveDrive" onclick="saveToDrive()">💾 Sauver sur Drive</button>
+      <span class="pill"><span class="dot" id="authDot"></span><span id="authLabel">Lecture</span></span>
+      <button class="btn gh sm" id="btnAuth" onclick="promptAuth()">🔐</button>
+      <button class="btn ac sm" onclick="saveToDrive()">💾 Drive</button>
     </div>
   </div>
 </header>
 
-<main>
-  <!-- COLONNE GAUCHE : Sélection + Réservations -->
-  <div>
+<nav class="tabs">
+  <div class="inner">
+    <button class="active" data-tab="dashboard" onclick="goTab('dashboard')"><span class="ico">🏠</span>Tableau de bord</button>
+    <button data-tab="reservations" onclick="goTab('reservations')"><span class="ico">📅</span>Réservations</button>
+    <button data-tab="map" onclick="goTab('map')"><span class="ico">🗺️</span>Carte</button>
+    <button data-tab="people" onclick="goTab('people')"><span class="ico">👥</span>Personnes</button>
+    <button data-tab="places" onclick="goTab('places')"><span class="ico">📍</span>Emplacements</button>
+    <button data-tab="stats" onclick="goTab('stats')"><span class="ico">📊</span>Statistiques</button>
+    <button data-tab="admin" onclick="goTab('admin')"><span class="ico">⚙️</span>Administration</button>
+    <button data-tab="io" onclick="goTab('io')"><span class="ico">📤</span>Import/Export</button>
+  </div>
+</nav>
 
-    <!-- Barre Auth -->
-    <div class="auth-bar">
-      <div class="status">
-        <span class="dot" id="authDot"></span>
-        <span id="authLabel">Mode lecture seule</span>
+<main>
+
+  <!-- ============== TABLEAU DE BORD ============== -->
+  <section id="screen-dashboard" class="screen active">
+    <div class="grid-2">
+      <div>
+        <div class="card">
+          <h2><span class="ttl">📊 Vue d'ensemble</span><span class="muted" id="dashPeriod"></span></h2>
+          <div class="grid-4">
+            <div class="stat"><div class="num" id="dashTotal">0</div><div class="lbl">Réservations</div></div>
+            <div class="stat acc"><div class="num" id="dashHours">0h</div><div class="lbl">Heures</div></div>
+            <div class="stat ok"><div class="num" id="dashPeople">0</div><div class="lbl">Personnes</div></div>
+            <div class="stat"><div class="num" id="dashPlaces">0</div><div class="lbl">Emplacements</div></div>
+          </div>
+          <div class="rgpd-note">🔒 Toutes les données restent dans votre Drive personnel. Aucun envoi à un tiers.</div>
+        </div>
+        <div class="card">
+          <h2><span class="ttl">📅 Aujourd'hui</span><span class="muted" id="todayDate"></span></h2>
+          <div id="todayList"><p class="empty">— Chargement —</p></div>
+        </div>
       </div>
       <div>
-        <button class="btn btn-outline btn-sm" id="btnAuth" onclick="promptAuth()">🔐 Se connecter</button>
-      </div>
-    </div>
-
-    <!-- Sélection Mois + Jour -->
-    <div class="card">
-      <h2>📅 Sélection Mois &amp; Jour</h2>
-      <div class="selector-row">
-        <div>
-          <label>Mois</label>
-          <select id="selMonth" onchange="onMonthChange()"></select>
+        <div class="chrono" id="chronoBox">
+          <h2><span class="ttl">⏱️ Chronomètre</span></h2>
+          <div class="chrono-phase" id="chronoPhase">Au repos</div>
+          <div class="chrono-ctx">
+            <div class="lab">Contexte</div>
+            <div class="v" id="chronoCtx">— Aucun créneau actif —</div>
+          </div>
+          <div class="chrono-d" id="chronoD">30:00</div>
+          <div class="chrono-bar"><div class="fill" id="chronoBar" style="width:100%"></div></div>
+          <div class="chrono-a">
+            <button class="btn ok sm" id="bChStart" onclick="chronoStart()">▶️ Démarrer (3 min prépa)</button>
+            <button class="btn gh sm" id="bChSkip" onclick="chronoSkipToMain()" disabled>⏭️ Sauter prépa</button>
+            <button class="btn gh sm" id="bChPause" onclick="chronoPause()" disabled>⏸️ Pause</button>
+            <button class="btn ko sm" onclick="chronoReset()">🔄 Reset</button>
+          </div>
+          <div class="chrono-tip">3 min de préparation → bip court → 30 min de présence → bip final de 6 s</div>
         </div>
-        <div>
-          <label>Année</label>
-          <select id="selYear" onchange="renderDays()"></select>
+        <div class="card">
+          <h2><span class="ttl">🔥 Top emplacements</span><span class="muted">ce mois</span></h2>
+          <div id="dashTopPlaces"><p class="empty">—</p></div>
         </div>
       </div>
-      <div class="dow-row">
-        <div class="dow">Lun</div><div class="dow">Mar</div><div class="dow">Mer</div>
-        <div class="dow">Jeu</div><div class="dow">Ven</div><div class="dow we">Sam</div><div class="dow we">Dim</div>
-      </div>
-      <div class="days-grid" id="daysGrid"></div>
-      <div class="stats" style="margin-top:10px">
-        <div class="stat"><div class="num" id="statMonth">0</div><div class="lbl">créneaux mois</div></div>
-        <div class="stat"><div class="num" id="statDay">0</div><div class="lbl">créneaux jour</div></div>
-        <div class="stat"><div class="num" id="statFree">0</div><div class="lbl">empl. libres</div></div>
-      </div>
     </div>
+  </section>
 
-    <!-- Liste des emplacements + créneaux -->
-    <div class="card">
-      <h2>📍 Emplacements <span id="dayTitle" style="font-weight:400;color:var(--text-muted);font-size:.85rem;margin-left:8px"></span></h2>
+  <!-- ============== RÉSERVATIONS ============== -->
+  <section id="screen-reservations" class="screen">
+    <!-- SECTION À INSÉRER dans l'écran réservations, AVANT le calendrier -->
 
-      <div class="tabs">
-        <button class="tab active" data-view="list" onclick="setView('list')">Par emplacement</button>
-        <button class="tab" data-view="schedule" onclick="setView('schedule')">Vue chronologique</button>
-      </div>
-
-      <input type="text" class="search-box" id="searchEmpl" placeholder="🔍 Rechercher un emplacement…" oninput="renderEmplList()">
-
-      <div id="emplListView">
-        <div id="emplList"></div>
-        <div id="slotsArea" class="slot-list"></div>
-      </div>
-
-      <div id="scheduleView" class="hidden">
-        <div id="scheduleList"></div>
-      </div>
-
-      <div class="empl-legend">
-        <span><span class="dot" style="background:var(--surface)"></span>libre</span>
-        <span><span class="dot" style="background:#ecfdf5;border:1px solid #a7f3d0"></span>1+ proclamateur</span>
-        <span><span class="dot" style="background:#fef3c7;border:1px solid var(--accent)"></span>jour avec réservations</span>
-      </div>
-    </div>
-
+<div class="card" style="background:linear-gradient(135deg, #dbeafe 0%, #eff6ff 100%); border: 2px solid var(--pl)">
+  <h2><span class="ttl">⚡ Réservation rapide</span><span class="muted">aujourd'hui</span></h2>
+  <div class="rgpd-note" style="background:#fef3c7;border-color:#fbbf24">
+    📱 Mode terrain : sélectionnez l'emplacement, localisez-le sur la carte, validez les proclamateurs → le chrono 30 min démarre automatiquement.
   </div>
-
-  <!-- COLONNE DROITE : Chrono + Exports -->
-  <aside>
-
-    <!-- Chronomètre -->
-    <div class="chrono-wrap">
-      <h2>⏱️ Chronomètre 25 min</h2>
-      <div class="chrono-ctx" id="chronoCtx">
-        <div class="label">Emplacement / Proclamateur</div>
-        <div class="value" id="chronoCtxVal">— Cliquez sur un créneau pour démarrer —</div>
-      </div>
-      <div class="chrono-display" id="chronoDisplay">25:00</div>
-      <div class="chrono-label" id="chronoLabel">Prêt</div>
-      <div class="chrono-actions">
-        <button class="btn btn-success btn-sm" id="btnChronoStart" onclick="chronoStart()">▶️ Démarrer</button>
-        <button class="btn btn-ghost btn-sm" id="btnChronoPause" onclick="chronoPause()" disabled>⏸️ Pause</button>
-        <button class="btn btn-danger btn-sm" id="btnChronoReset" onclick="chronoReset()">🔄 Reset</button>
-      </div>
-      <div style="font-size:.7rem;opacity:.6;margin-top:8px">Bip de 6 s à 00:00 pour changer de lieu</div>
+  
+  <div style="margin-top:10px">
+    <div class="fld">
+      <label>📍 Emplacement</label>
+      <select id="qrEmpl" style="font-size:.95rem;padding:9px">
+        <option value="">— Choisir un emplacement —</option>
+      </select>
+    </div>
+    
+    <div style="display:flex;gap:6px;margin-bottom:10px">
+      <button class="btn ac w" id="btnQrLocate" onclick="quickLocate()" disabled>
+        🗺️ Localiser sur la carte
+      </button>
     </div>
 
-    <!-- Actions rapides -->
+    <div class="fld" id="qrProcsBox" style="display:none">
+      <label>👥 Proclamateurs présents (2-3 recommandés, max 4)</label>
+      <div style="max-height:180px;overflow-y:auto;border:1px solid var(--bd);border-radius:8px;padding:6px;background:var(--sf)">
+        <div id="qrProcsList"></div>
+      </div>
+      <div style="display:flex;gap:6px;margin-top:8px">
+        <button class="btn ok w" id="btnQrValidate" onclick="quickValidate()">
+          ✅ Valider et démarrer le chrono 30 min
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<hr class="divider">
+
     <div class="card">
-      <h2>📤 Exports &amp; Actions</h2>
-      <button class="btn" style="width:100%;margin-bottom:6px" onclick="exportWhatsApp()">💬 Export WhatsApp du jour</button>
-      <button class="btn btn-outline" style="width:100%;margin-bottom:6px" onclick="exportMonthCSV()">📊 Export CSV du mois</button>
-      <button class="btn btn-outline" style="width:100%;margin-bottom:6px" onclick="exportJSON()">💾 Sauver en local (JSON)</button>
-      <button class="btn btn-outline" style="width:100%;margin-bottom:6px" onclick="document.getElementById('fileImport').click()">📁 Importer JSON</button>
-      <input type="file" id="fileImport" accept=".json" style="display:none" onchange="importJSON(event)">
-      <button class="btn btn-outline" style="width:100%" onclick="loadFromDrive()">☁️ Recharger depuis Drive</button>
-    </div>
-
-    <!-- Récap rapide -->
-    <div class="card">
-      <h2>📊 Récap du jour</h2>
-      <div id="daySummary" style="font-size:.85rem">
-        <p style="color:var(--text-muted);font-style:italic">Sélectionnez un jour pour voir le récapitulatif.</p>
+      <h2><span class="ttl">📅 Sélection du jour</span><button class="btn out sm" onclick="goToday()">📍 Aujourd'hui</button></h2>
+      <div class="sel-row">
+        <div class="fld"><label>Mois</label><select id="selMonth" onchange="onMonthChange()"></select></div>
+        <div class="fld"><label>Année</label><select id="selYear" onchange="onMonthChange()"></select></div>
+        <div class="fld"><label>Recherche</label><input type="text" id="searchAll" placeholder="🔍 emplacement / personne…" oninput="renderEmplList()"></div>
+      </div>
+      <div class="cal-head"><div>Lun</div><div>Mar</div><div>Mer</div><div>Jeu</div><div>Ven</div><div class="we">Sam</div><div class="we">Dim</div></div>
+      <div class="cal-grid" id="calGrid"></div>
+      <div class="grid-3" style="margin-top:10px">
+        <div class="stat"><div class="num" id="stMonth">0</div><div class="lbl">créneaux mois</div></div>
+        <div class="stat"><div class="num" id="stDay">0</div><div class="lbl">créneaux jour</div></div>
+        <div class="stat"><div class="num" id="stFree">0</div><div class="lbl">empl. libres</div></div>
       </div>
     </div>
 
-  </aside>
+    <div class="card">
+      <h2><span class="ttl">📍 Emplacements <span class="muted" id="dayTitle"></span></span></h2>
+      <div id="emplListBox">
+        <div id="emplList"></div>
+        <hr class="divider">
+        <div id="slotsArea"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============== CARTE ============== -->
+  <section id="screen-map" class="screen">
+    <div class="card">
+      <h2><span class="ttl">🗺️ Carte des emplacements</span><span class="muted">Chelles &amp; Aulnoy</span></h2>
+      <div class="rgpd-note">Carte basée sur OpenStreetMap. Aucun cookie tiers, pas de traçage. Les coordonnées GPS sont stockées dans votre Drive.</div>
+      <div id="mapView"></div>
+      <p class="muted" style="margin-top:6px">💡 Cliquez sur un marqueur pour voir l'emplacement et ses réservations du jour sélectionné.</p>
+    </div>
+  </section>
+
+  <!-- ============== PERSONNES ============== -->
+  <section id="screen-people" class="screen">
+    <div class="card">
+      <h2><span class="ttl">👥 Personnes <span class="muted" id="peopleCount"></span></span></h2>
+      <div class="rgpd-note">🔒 Affichage RGPD : prénom + initiale du nom. Un identifiant anonyme stable (P-xxxx) est utilisé pour les exports et statistiques.</div>
+      <input type="text" class="search" id="searchPeople" placeholder="🔍 Rechercher une personne…" oninput="renderPeople()">
+      <div class="fld" style="display:flex;gap:8px;align-items:end;margin-bottom:8px;flex-wrap:wrap">
+        <div style="flex:1;min-width:160px"><label>Trier par</label>
+          <select id="peopleSort" onchange="renderPeople()">
+            <option value="name">Nom alphabétique</option>
+            <option value="resv">Nombre de réservations ↓</option>
+            <option value="hours">Heures cumulées ↓</option>
+          </select>
+        </div>
+      </div>
+      <div id="peopleList"></div>
+    </div>
+  </section>
+
+  <!-- ============== EMPLACEMENTS ============== -->
+  <section id="screen-places" class="screen">
+    <div class="card">
+      <h2><span class="ttl">📍 Emplacements <span class="muted" id="placesCount"></span></span></h2>
+      <input type="text" class="search" id="searchPlaces" placeholder="🔍 Rechercher un emplacement…" oninput="renderPlaces()">
+      <div class="fld" style="display:flex;gap:8px;align-items:end;margin-bottom:8px;flex-wrap:wrap">
+        <div style="flex:1;min-width:160px"><label>Trier par</label>
+          <select id="placesSort" onchange="renderPlaces()">
+            <option value="name">Nom alphabétique</option>
+            <option value="resv">Nb réservations ↓</option>
+            <option value="hours">Heures cumulées ↓</option>
+          </select>
+        </div>
+      </div>
+      <div id="placesList"></div>
+    </div>
+  </section>
+
+  <!-- ============== STATISTIQUES ============== -->
+  <section id="screen-stats" class="screen">
+    <div class="card">
+      <h2><span class="ttl">📊 Statistiques</span><span class="muted">vue globale</span></h2>
+      <div class="fld" style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px">
+        <div><label>Période</label>
+          <select id="statsPeriod" onchange="renderStats()">
+            <option value="week">Semaine courante</option>
+            <option value="month" selected>Mois courant</option>
+            <option value="year">Année courante</option>
+            <option value="all">Tout l'historique</option>
+          </select>
+        </div>
+        <div><label>Date de référence</label><input type="date" id="statsRef" onchange="renderStats()"></div>
+      </div>
+      <div class="grid-4" id="statsKPI"></div>
+    </div>
+    <div class="grid-2">
+      <div class="card"><h2><span class="ttl">🏆 Top emplacements</span></h2><div id="statsTopPlaces"></div></div>
+      <div class="card"><h2><span class="ttl">👤 Top participants</span></h2><div id="statsTopPeople"></div></div>
+    </div>
+    <div class="card"><h2><span class="ttl">📜 Historique détaillé</span><span class="muted" id="histCount"></span></h2>
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;margin-bottom:8px">
+        <input type="text" class="search" id="histF1" placeholder="Filtre emplacement…" oninput="renderHistory()" style="margin:0">
+        <input type="text" class="search" id="histF2" placeholder="Filtre personne…" oninput="renderHistory()" style="margin:0">
+        <select id="histF3" onchange="renderHistory()" class="search" style="margin:0"><option value="">Tous statuts</option><option value="planned">Planifié</option><option value="done">Effectué</option><option value="cancelled">Annulé</option></select>
+      </div>
+      <div id="histTable" style="overflow-x:auto"></div>
+    </div>
+  </section>
+
+  <!-- ============== ADMINISTRATION ============== -->
+  <section id="screen-admin" class="screen">
+    <div class="card">
+      <h2><span class="ttl">⚙️ Connexion backend</span></h2>
+      <div class="rgpd-note">Le backend (Google Apps Script) gère l'authentification, la sauvegarde Drive et l'audit. Sans backend, l'app fonctionne en local (les modifications ne quittent pas votre navigateur).</div>
+      <div class="fld"><label>URL Google Apps Script (/exec)</label><input type="text" id="cfgGasUrl" placeholder="https://script.google.com/macros/s/XXXX/exec"></div>
+      <div class="fld"><label>ID dossier Drive</label><input type="text" id="cfgFolderId" placeholder="1TGV87NWB5fUrLYfyxRhnyMIGxXio12j9"></div>
+      <button class="btn ok" onclick="saveConfig()">💾 Enregistrer</button>
+      <button class="btn out" onclick="testConnection()">🔌 Tester la connexion</button>
+    </div>
+    <div class="card">
+      <h2><span class="ttl">⏱️ Paramètres du chronomètre</span></h2>
+      <div class="grid-3">
+        <div class="fld"><label>Prépa (min)</label><input type="number" id="cfgPrepMin" value="3" min="0" max="30"></div>
+        <div class="fld"><label>Présence (min)</label><input type="number" id="cfgMainMin" value="30" min="1" max="120"></div>
+        <div class="fld"><label>Bip final (s)</label><input type="number" id="cfgBipSec" value="6" min="1" max="30"></div>
+      </div>
+      <button class="btn ok" onclick="saveTimerCfg()">💾 Enregistrer</button>
+    </div>
+    <div class="card">
+      <h2><span class="ttl">🔒 Politique RGPD</span></h2>
+      <ul style="padding-left:20px;font-size:.82rem;line-height:1.7">
+        <li><b>Minimisation</b> : affichage limité à prénom + initiale du nom de famille</li>
+        <li><b>Identifiant anonyme</b> stable (P-xxxx) utilisé pour les exports et statistiques</li>
+        <li><b>Stockage</b> : Drive personnel du responsable + cache navigateur (effaçable depuis « Réglages → Réinitialiser »)</li>
+        <li><b>Audit</b> : journal des connexions et sauvegardes (feuille Sheets dans le dossier Drive)</li>
+        <li><b>Suppression</b> : bouton « purger les données » ci-dessous (irréversible)</li>
+        <li><b>Sous-traitants</b> : Google (hébergement Drive), OpenStreetMap (tuiles carte, sans cookie)</li>
+      </ul>
+      <button class="btn ko" onclick="purgeLocal()" style="margin-top:8px">🗑️ Purger les données locales</button>
+    </div>
+  </section>
+
+  <!-- ============== IMPORT / EXPORT ============== -->
+  <section id="screen-io" class="screen">
+    <div class="grid-2">
+      <div class="card">
+        <h2><span class="ttl">📤 Exports</span></h2>
+        <button class="btn w" style="margin-bottom:6px" onclick="exportWhatsApp()">💬 WhatsApp — Jour sélectionné</button>
+        <button class="btn out w" style="margin-bottom:6px" onclick="exportMonthCSV()">📊 CSV — Mois en cours</button>
+        <button class="btn out w" style="margin-bottom:6px" onclick="exportAllCSV()">📊 CSV — Tout l'historique</button>
+        <button class="btn out w" style="margin-bottom:6px" onclick="exportXLSX()">📗 Excel (.xlsx) — Tout</button>
+        <button class="btn out w" onclick="exportJSON()">💾 Backup JSON complet</button>
+      </div>
+      <div class="card">
+        <h2><span class="ttl">📥 Imports</span></h2>
+        <button class="btn ac w" style="margin-bottom:6px" onclick="loadFromDrive()">☁️ Recharger depuis Drive</button>
+        <button class="btn out w" style="margin-bottom:6px" onclick="document.getElementById('fImp').click()">📁 Restaurer un backup JSON</button>
+        <input type="file" id="fImp" accept=".json" style="display:none" onchange="importJSON(event)">
+        <hr class="divider">
+        <h3>Fusionner un backup</h3>
+        <p class="muted">Permet d'ajouter les réservations d'un autre fichier sans écraser les vôtres.</p>
+        <button class="btn out w" onclick="document.getElementById('fMrg').click()">🔀 Fusionner un JSON</button>
+        <input type="file" id="fMrg" accept=".json" style="display:none" onchange="mergeJSON(event)">
+      </div>
+    </div>
+  </section>
+
 </main>
 
-<!-- ============ MODALS ============ -->
-
-<!-- Choix proclamateur -->
-<div class="modal" id="modalProc">
-  <div class="modal-content">
-    <h3>
-      <span>➕ Ajouter un proclamateur</span>
-      <button class="close" onclick="closeModal('modalProc')">×</button>
-    </h3>
-    <div id="modalProcCtx" style="font-size:.85rem;color:var(--text-muted);margin-bottom:10px"></div>
-    <input type="text" class="search-box" id="searchProc" placeholder="🔍 Rechercher un nom…" oninput="renderProcGrid()">
-    <div class="proc-grid" id="procGrid"></div>
-    <p class="rgpd-tip">Max. 4 proclamateurs par créneau. Cliquer sur un nom pour l'ajouter.</p>
-    <div style="margin-top:10px;text-align:right">
-      <button class="btn btn-outline btn-sm" onclick="closeModal('modalProc')">Fermer</button>
-    </div>
+<!-- ============== MODALS ============== -->
+<div class="modal" id="mProc">
+  <div class="modal-c">
+    <h3>➕ Ajouter un proclamateur<button class="cl" onclick="closeM('mProc')">×</button></h3>
+    <div id="mProcCtx" class="muted" style="margin-bottom:8px"></div>
+    <input type="text" class="search" id="mProcSearch" placeholder="🔍 Rechercher…" oninput="renderProcGrid()">
+    <div class="pgrid" id="mProcGrid"></div>
+    <p class="muted" style="margin-top:6px">Max. 4 personnes par créneau. Cliquer ajoute ou retire.</p>
+    <div style="text-align:right;margin-top:8px"><button class="btn out sm" onclick="closeM('mProc')">Fermer</button></div>
   </div>
 </div>
 
-<!-- Auth -->
-<div class="modal" id="modalAuth">
-  <div class="modal-content" style="max-width:400px">
-    <h3>🔐 Connexion administrateur<button class="close" onclick="closeModal('modalAuth')">×</button></h3>
-    <div class="field">
-      <label>Identifiant</label>
-      <input type="text" id="authUser" autocomplete="username">
-    </div>
-    <div class="field">
-      <label>Mot de passe</label>
-      <input type="password" id="authPass" autocomplete="current-password">
-    </div>
-    <p style="font-size:.75rem;color:var(--text-muted);margin-bottom:10px">
-      La connexion est faite côté serveur (Apps Script) avec sel et jeton de session de 4h.
-    </p>
-    <div style="text-align:right">
-      <button class="btn btn-outline btn-sm" onclick="closeModal('modalAuth')">Annuler</button>
-      <button class="btn btn-sm" onclick="doAuth()">Se connecter</button>
-    </div>
+<div class="modal" id="mAuth">
+  <div class="modal-c" style="max-width:380px">
+    <h3>🔐 Connexion<button class="cl" onclick="closeM('mAuth')">×</button></h3>
+    <div class="fld"><label>Identifiant</label><input type="text" id="aUser" autocomplete="username"></div>
+    <div class="fld"><label>Mot de passe</label><input type="password" id="aPass" autocomplete="current-password" onkeydown="if(event.key==='Enter')doAuth()"></div>
+    <p class="muted" style="margin:6px 0">Connexion serveur avec sel UUID et jeton de session 4h. Audit complet dans le journal Drive.</p>
+    <div style="text-align:right"><button class="btn out sm" onclick="closeM('mAuth')">Annuler</button> <button class="btn sm" onclick="doAuth()">Se connecter</button></div>
   </div>
 </div>
 
-<!-- Réglages -->
-<div class="modal" id="modalSettings">
-  <div class="modal-content">
-    <h3>⚙️ Réglages<button class="close" onclick="closeModal('modalSettings')">×</button></h3>
-    <div class="field">
-      <label>URL Google Apps Script (endpoint /exec)</label>
-      <input type="text" id="gasUrl" placeholder="https://script.google.com/macros/s/XXXX/exec">
-      <p class="rgpd-tip">Laissez vide pour fonctionner en mode local (localStorage uniquement).</p>
+<div class="modal" id="mEditPlace">
+  <div class="modal-c">
+    <h3 id="mEPTitle">📍 Emplacement<button class="cl" onclick="closeM('mEditPlace')">×</button></h3>
+    <div class="fld"><label>Nom</label><input type="text" id="ePName" disabled></div>
+    <div class="grid-2">
+      <div class="fld"><label>Latitude</label><input type="number" id="ePLat" step="0.000001"></div>
+      <div class="fld"><label>Longitude</label><input type="number" id="ePLng" step="0.000001"></div>
     </div>
-    <div class="field">
-      <label>ID du dossier Drive (optionnel)</label>
-      <input type="text" id="driveFolderId" placeholder="1TGV87NWB5fUrLYfyxRhnyMIGxXio12j9">
-    </div>
-    <div class="field">
-      <label>Durée du chronomètre (minutes)</label>
-      <input type="text" id="chronoMins" value="25">
-    </div>
-    <div class="field">
-      <label>Durée du bip final (secondes)</label>
-      <input type="text" id="bipSecs" value="6">
-    </div>
-    <div style="text-align:right">
-      <button class="btn btn-outline btn-sm" onclick="closeModal('modalSettings')">Annuler</button>
-      <button class="btn btn-sm" onclick="saveSettings()">Enregistrer</button>
-    </div>
+    <div class="fld"><label>Notes (optionnel)</label><textarea id="ePNotes" placeholder="Ex: accessible PMR, prises électriques disponibles…"></textarea></div>
+    <p class="muted">💡 Astuce : faites clic-droit sur Google Maps → coordonnées copiables.</p>
+    <div style="text-align:right;margin-top:8px"><button class="btn out sm" onclick="closeM('mEditPlace')">Annuler</button> <button class="btn sm" onclick="saveEditPlace()">Enregistrer</button></div>
   </div>
 </div>
 
-<!-- Aide -->
-<div class="modal" id="modalHelp">
-  <div class="modal-content">
-    <h3>❓ Aide rapide<button class="close" onclick="closeModal('modalHelp')">×</button></h3>
-    <ol style="padding-left:20px;font-size:.88rem;line-height:1.7">
-      <li><b>Choisissez un mois puis un jour</b> dans le calendrier en haut.</li>
-      <li><b>Sélectionnez un emplacement</b> dans la liste (filtrable par recherche).</li>
-      <li><b>Cliquez sur un créneau horaire</b> puis ajoutez 1 à 4 proclamateurs.</li>
-      <li><b>Chronomètre</b> : démarré depuis un créneau, il signale 25 min par un bip de 6 s.</li>
-      <li><b>Export WhatsApp</b> : message global listant toutes les réservations du jour.</li>
-      <li><b>Sauvegarde Drive</b> : nécessite la connexion admin (script GAS associé).</li>
-    </ol>
-    <p style="margin-top:12px;font-size:.8rem;color:var(--text-muted)">
-      Données : 32 emplacements, 83 proclamateurs actifs, 59 créneaux de 15 min (06:30 → 21:00).
-    </p>
-    <div style="margin-top:10px;text-align:right">
-      <button class="btn btn-sm" onclick="closeModal('modalHelp')">Fermer</button>
+<div class="modal" id="mEditRes">
+  <div class="modal-c">
+    <h3 id="mERTitle">✏️ Modifier la réservation<button class="cl" onclick="closeM('mEditRes')">×</button></h3>
+    <div class="grid-2">
+      <div class="fld"><label>Heure</label><select id="eRHour"></select></div>
+      <div class="fld"><label>Statut</label><select id="eRStatus"><option value="planned">Planifié</option><option value="done">Effectué</option><option value="cancelled">Annulé</option></select></div>
+    </div>
+    <div class="fld"><label>Notes</label><textarea id="eRNotes" placeholder="Notes libres…"></textarea></div>
+    <div style="text-align:right;margin-top:8px">
+      <button class="btn ko sm" onclick="deleteRes()">🗑️ Supprimer</button>
+      <button class="btn out sm" onclick="closeM('mEditRes')">Annuler</button>
+      <button class="btn sm" onclick="saveEditRes()">Enregistrer</button>
     </div>
   </div>
 </div>
@@ -384,820 +543,1170 @@ footer a{color:var(--primary);text-decoration:none}
 <div class="toast" id="toast"></div>
 
 <footer>
-  BeluSoft-Tchapy © 2026 — Planning Présentoirs Chelles V1 —
-  <a href="#" onclick="openModal('modalHelp');return false">Aide</a> ·
-  <a href="#" onclick="openModal('modalSettings');return false">Réglages</a>
+  Présentoirs Chelles V2 — BeluSoft-Tchapy © 2026 — RGPD &amp; Drive-first
 </footer>
 
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
 <script>
-/* ============================================================
-   PLANNING PRÉSENTOIRS — CHELLES  V1
-   BeluSoft-Tchapy © 2026 — Modèle Planning Sono & Accueil V7
-   ============================================================ */
+/* === Le code applicatif est en script séparé pour clarté === */
+</script>
+<script>
+/* =============================================================
+   PRÉSENTOIRS CHELLES V2 — Moteur applicatif
+   BeluSoft-Tchapy © 2026
+   Architecture : Front statique (HTML/CSS/JS) + Backend GAS + Drive
+   RGPD : minimisation, ID anonymes, audit, stockage Drive personnel
+   ============================================================= */
 
-// --- Données extraites du fichier Excel ---
+/* ----- DONNÉES STATIQUES (issues du fichier Excel) ----- */
 const EMPLACEMENTS = ["Aulnoy - Place Georges Guillaume","Aulnoy - Square","Av. Résistance - Entrée du Parc place Cala (grille fer forgé)","Av. Résistance - Face la BNP","Av. Résistance - Marché côté marchand-primeurs","Av. Résistance (à côté de Franprix et du N°63)","Av. Résistance (entre le 1 et 3 - Monument)","Av. Résistance Place du marché (en dehors jours de marché)","Avenue Foch (à côté de la Poste)","Avenue Foch (en face à la Poste)","Boulevard Pierre Mendès France","Brou Hall Marché","Brou Hall Marché (à l'arrière)","D 34 avenue Sylvie (niveau Station Service Auchan)","D 34 avenue Sylvie (rond point rue Auguste Meunier)","Gambetta - (rond point) et la rue Besson","Gambetta - Mairie rond point Rues Louis Eterlet et René Sallé","Gambetta - rond point avec la rue de l'Ilette","GARE ROUTIERE - Entrée du Parc","GARE ROUTIERE (face à l'entrée gare SNCF)","GARE ROUTIERE place du Grand Jardin (finances publiques)","GARE SNCF (à côté de la Villa Max)","GARE SNCF (côté café/restaurant)","Marché (arrière dans la descente)","Parc (quai Auguste Prévost - rue Jean Moulin) berges de la Marne","PARKING FRANCILIENNE - STATION TOTALE","Pont SNCF (côté numéros impairs côté gare)","Pont SNCF (côté numéros pairs)","Rond point Carrefour (partie haute)","Rue de la Paix (face à l'entrée SNCF)","Rue jean Jaurès & rue Gambetta","Voie piétonne - rue R. Counil (face à l'entrée SNCF)"];
 
-const PROCLAMATEURS = ["Alain G","Anne Marie G","Anne-Astrid P","Axel Z","Boris M","Bruce M","Cap Verdien","Caroline F","Catherine M","Catherine Z","Chloé R","Claude M","Cleto F","Cécile P","Daline G","Daniel Z","Denise P","Diana P","Didier M","Doris M","Edwige O","Elisabeth C","Elodie Z","Emmanuela M","Ferdinand T","Frédérique H","Géraldine A","Gérard W","Jacqueline D","Jean G","Jean Philippe L","Jocelyne M","Joconde W","Joël D","Joël P","Jéremie L","Karina D","Lesley Ann T","Lina L","Luc B","Lucette D","Lydie A","Lydie S","Lydie V","Lyne B","Manuel P","Marc H","Marc L","Marc P","Marie Christine C","Marie-Hélène M","Marion D","Marius B","Marius C","Marlène E","Maryline A","Michelle P","Monique M","Nadège L","Odile F","Patrick D","Peggy G","Philippe D","Philippe R","Philippe V","Pierre G","Portugais","Priscille R","Reynald K","Robert I","Rosemarie H","Sabrina D","Samuel G","Sandra B","Sandra I","Stella D","Sylviane L","Terreblanche M","Thierry V","Thérèse M","Valéry A","Wesner A","Yannick D"];
+const PROCLAMATEURS = ["Alain G","Anne Marie G","Anne-Astrid P","Axel Z","Boris M","Bruce M","Cap Verdien","Caroline F","Catherine M","Catherine Z","Chloé R","Claude M","Cleto F","Cécile P","Daline G","Daniel Z","Denise P","Diana P","Didier M","Doris M","Edwige O","Elisabeth C","Elodie Z","Emmanuela M","Ferdinand T","Frédérique H","Géraldine A","Gérard W","Jacqueline D","Jean G","Jean Philippe L","Jocelyne M","Joconde W","Joël D","Joël P","Jéremie L","Karina D","Lesley Ann T","Lina L","Luc B","Lucette D","Lydie A","Lydie S","Lydie V","Lyne B","Manuel P","Marc H","Marc L","Marc P","Marie Christine C","Marie-Hélène M","Marion D","Marius B","Marius C","Marlène E","Maryline A","Michelle P","Monique M","Nadège L","Odile F","Patrick D","Peggy G","Philippe D","Philippe R","Philippe V","Pierre G","Portugais","Priscille R","Reynald K","Robert I","Rosemarie H","Sabrina D","Samuel G","Sandra B","Sandra I","Stella D","Sylviane L","Terreblanche M","Thierry V","Thérèse M","Valéry A","Wesner A","Yannick D","Proclamateur extérieur","Ketsya G","Charlène M","Magalie P","Marie C","Muriel D","Jean Michel D","Flavie V","Marlène B","Aymeric G","Priscille L","Rose-Marie H","Claire L","Althea G"];
 
 const HORAIRES = ["06:30","06:45","07:00","07:15","07:30","07:45","08:00","08:15","08:30","08:45","09:00","09:15","09:30","09:45","10:00","10:15","10:30","10:45","11:00","11:15","11:30","11:45","12:00","12:15","12:30","12:45","13:00","13:15","13:30","13:45","14:00","14:15","14:30","14:45","15:00","15:15","15:30","15:45","16:00","16:15","16:30","16:45","17:00","17:15","17:30","17:45","18:00","18:15","18:30","18:45","19:00","19:15","19:30","19:45","20:00","20:15","20:30","20:45","21:00"];
 
-const MOIS_NOMS = ["Janvier","Février","Mars","Avril","Mai","Juin","Juillet","Août","Septembre","Octobre","Novembre","Décembre"];
-const MAX_PROCS_PAR_CRENEAU = 4;
-const STORAGE_KEY = 'presentoir_chelles_v1';
-const SETTINGS_KEY = 'presentoir_chelles_settings_v1';
+const MOIS = ["Janvier","Février","Mars","Avril","Mai","Juin","Juillet","Août","Septembre","Octobre","Novembre","Décembre"];
+const JOURS_L = ["Dimanche","Lundi","Mardi","Mercredi","Jeudi","Vendredi","Samedi"];
+const JOURS_C = ["Dim","Lun","Mar","Mer","Jeu","Ven","Sam"];
 
-// --- État global ---
-let state = {
-  // reservations[moisKey][jour][emplacement][horaire] = [proclamateurs...]
-  // moisKey = "YYYY-MM"
-  reservations: {},
-  currentMonth: new Date().getMonth(),
-  currentYear: new Date().getFullYear(),
-  currentDay: null,
-  currentEmpl: null,
-  view: 'list',
-  // Session admin
-  authenticated: false,
-  sessionToken: null,
-  authUser: null
+/* GPS (modifiable par l'admin et sauvé sur Drive) */
+const GEO_DEFAULT = {"Aulnoy - Place Georges Guillaume": [48.874247, 2.616323], "Aulnoy - Square": [48.87468, 2.614427], "Av. Résistance - Entrée du Parc place Cala (grille fer forgé)": [48.878547, 2.594443], "Av. Résistance - Face la BNP": [48.87731, 2.594403], "Av. Résistance - Marché côté marchand-primeurs": [48.879497, 2.596523], "Av. Résistance (à côté de Franprix et du N°63)": [48.879423, 2.595337], "Av. Résistance (entre le 1 et 3 - Monument)": [48.878433, 2.596827], "Av. Résistance Place du marché (en dehors jours de marché)": [48.877223, 2.594187], "Avenue Foch (à côté de la Poste)": [48.87803, 2.594507], "Avenue Foch (en face à la Poste)": [48.87941, 2.593267], "Boulevard Pierre Mendès France": [48.882193, 2.58566], "Brou Hall Marché": [48.893047, 2.60839], "Brou Hall Marché (à l'arrière)": [48.891513, 2.6095], "D 34 avenue Sylvie (niveau Station Service Auchan)": [48.871337, 2.602637], "D 34 avenue Sylvie (rond point rue Auguste Meunier)": [48.869487, 2.601607], "Gambetta - (rond point) et la rue Besson": [48.879987, 2.58686], "Gambetta - Mairie rond point Rues Louis Eterlet et René Sallé": [48.877063, 2.586763], "Gambetta - rond point avec la rue de l'Ilette": [48.877797, 2.588607], "GARE ROUTIERE - Entrée du Parc": [48.877977, 2.588967], "GARE ROUTIERE (face à l'entrée gare SNCF)": [48.876417, 2.590943], "GARE ROUTIERE place du Grand Jardin (finances publiques)": [48.878483, 2.589957], "GARE SNCF (à côté de la Villa Max)": [48.876293, 2.59125], "GARE SNCF (côté café/restaurant)": [48.87816, 2.5914], "Marché (arrière dans la descente)": [48.877667, 2.595083], "Parc (quai Auguste Prévost - rue Jean Moulin) berges de la Marne": [48.876657, 2.5906], "PARKING FRANCILIENNE - STATION TOTALE": [48.884237, 2.577613], "Pont SNCF (côté numéros impairs côté gare)": [48.87825, 2.590307], "Pont SNCF (côté numéros pairs)": [48.875893, 2.589223], "Rond point Carrefour (partie haute)": [48.882587, 2.58649], "Rue de la Paix (face à l'entrée SNCF)": [48.87764, 2.590317], "Rue jean Jaurès & rue Gambetta": [48.878027, 2.587253], "Voie piétonne - rue R. Counil (face à l'entrée SNCF)": [48.875553, 2.590047]};
+
+/* Réservations de mai 2026 (pré-chargées depuis l'Excel) */
+const PRESEED = [{"empl": "GARE SNCF (côté café/restaurant)", "jour": 1, "h": "10:30", "procs": ["Alycia P", "Proclamateur extérieur"]}, {"empl": "GARE ROUTIERE - Entrée du Parc", "jour": 1, "h": "11:00", "procs": ["Charlène M", "Ketsya G"]}, {"empl": "GARE SNCF (à côté de la Villa Max)", "jour": 1, "h": "11:15", "procs": ["Daniel Z", "Catherine Z"]}, {"empl": "Av. Résistance - Entrée du Parc place Cala (grille fer forgé)", "jour": 1, "h": "14:45", "procs": ["Odile F", "Claire L"]}, {"empl": "GARE ROUTIERE - Entrée du Parc", "jour": 1, "h": "17:45", "procs": ["Ketsya G", "Claire L", "Odile F"]}, {"empl": "Aulnoy - Place Georges Guillaume", "jour": 2, "h": "10:00", "procs": ["Anne Marie G", "Marie-Paule D"]}, {"empl": "GARE ROUTIERE - Entrée du Parc", "jour": 2, "h": "10:15", "procs": ["Philippe R"]}, {"empl": "Gambetta - (rond point) et la rue Besson", "jour": 2, "h": "10:15", "procs": ["Doris M", "Maxime M", "Marlène E"]}, {"empl": "Aulnoy - Place Georges Guillaume", "jour": 2, "h": "10:30", "procs": ["Anne Marie G", "Marie-Paule D"]}, {"empl": "Gambetta - (rond point) et la rue Besson", "jour": 2, "h": "11:00", "procs": ["Lina L", "Robert I"]}, {"empl": "Pont SNCF (côté numéros impairs côté gare)", "jour": 4, "h": "09:45", "procs": ["Ketsya G", "Odile F"]}, {"empl": "GARE SNCF (à côté de la Villa Max)", "jour": 4, "h": "10:45", "procs": ["Ketsya G", "Odile F"]}, {"empl": "GARE ROUTIERE - Entrée du Parc", "jour": 4, "h": "17:45", "procs": ["Odile F"]}, {"empl": "GARE ROUTIERE (face à l'entrée gare SNCF)", "jour": 4, "h": "18:15", "procs": ["Priscille L", "Ketsya G"]}, {"empl": "Pont SNCF (côté numéros pairs)", "jour": 5, "h": "10:00", "procs": ["Catherine Z", "Sandra B"]}, {"empl": "GARE SNCF (côté café/restaurant)", "jour": 5, "h": "11:00", "procs": ["Catherine Z", "Frédérique H", "Sandra B"]}, {"empl": "GARE SNCF (côté café/restaurant)", "jour": 6, "h": "10:00", "procs": ["Jocelyne M", "Claude M"]}, {"empl": "GARE ROUTIERE (face à l'entrée gare SNCF)", "jour": 6, "h": "11:00", "procs": ["Catherine Z", "Marie C", "Claude M"]}, {"empl": "Av. Résistance - Entrée du Parc place Cala (grille fer forgé)", "jour": 7, "h": "10:15", "procs": ["Emmanuela M", "Ketsya G"]}, {"empl": "GARE ROUTIERE - Entrée du Parc", "jour": 7, "h": "11:00", "procs": ["Emmanuela M", "Ketsya G"]}, {"empl": "Parc (quai Auguste Prévost - rue Jean Moulin) berges de la Marne", "jour": 7, "h": "15:30", "procs": ["Proclamateur extérieur", "Ketsya G"]}, {"empl": "D 34 avenue Sylvie (rond point rue Auguste Meunier)", "jour": 7, "h": "16:15", "procs": ["Anne-Astrid P", "Odile F"]}, {"empl": "GARE SNCF (côté café/restaurant)", "jour": 8, "h": "10:30", "procs": ["Daniel Z", "Sonia A"]}, {"empl": "Av. Résistance - Marché côté marchand-primeurs", "jour": 8, "h": "10:30", "procs": ["Anne Marie G", "Marie C", "Pierre G"]}, {"empl": "GARE ROUTIERE - Entrée du Parc", "jour": 8, "h": "11:00", "procs": ["Anne Marie G", "Jackie M", "Anna L"]}, {"empl": "Av. Résistance - Marché côté marchand-primeurs", "jour": 8, "h": "11:15", "procs": ["Catherine Z", "Daniel Z"]}, {"empl": "GARE SNCF (à côté de la Villa Max)", "jour": 8, "h": "11:45", "procs": ["Anne Marie G", "Anna L", "Pierre G"]}, {"empl": "GARE ROUTIERE - Entrée du Parc", "jour": 8, "h": "15:15", "procs": ["Ketsya G", "Proclamateur extérieur"]}, {"empl": "Parc (quai Auguste Prévost - rue Jean Moulin) berges de la Marne", "jour": 8, "h": "17:45", "procs": ["Ketsya G", "Proclamateur extérieur"]}, {"empl": "GARE ROUTIERE place du Grand Jardin (finances publiques)", "jour": 9, "h": "08:30", "procs": ["Ketsya G", "Elodie Z", "Priscille L"]}, {"empl": "GARE ROUTIERE (face à l'entrée gare SNCF)", "jour": 9, "h": "09:00", "procs": ["Elodie Z", "Ketsya G", "Priscille L"]}, {"empl": "Av. Résistance - Marché côté marchand-primeurs", "jour": 9, "h": "10:30", "procs": ["Catherine Z", "Daniel Z"]}, {"empl": "D 34 avenue Sylvie (niveau Station Service Auchan)", "jour": 9, "h": "10:30", "procs": ["Flavie V", "Muriel D"]}, {"empl": "Avenue Foch (en face à la Poste)", "jour": 9, "h": "10:45", "procs": ["Elodie Z"]}, {"empl": "GARE ROUTIERE - Entrée du Parc", "jour": 9, "h": "10:45", "procs": ["Peggy G", "Yannick D", "Yanis M"]}, {"empl": "GARE SNCF (côté café/restaurant)", "jour": 10, "h": "11:15", "procs": ["Jean Michel D", "Daniel Z"]}];
+
+const MAX_PROCS = 4;
+const STORAGE_KEY = 'presentoir_chelles_v2_data';
+const CFG_KEY = 'presentoir_chelles_v2_cfg';
+const SLOT_DURATION_MIN = 15; // durée d'un créneau pour les stats
+
+/* ----- ÉTAT ----- */
+let S = {
+  // Index principal : reservations = [{id, date:'YYYY-MM-DD', heureStart, heureEnd, empl, procs:[], status, notes, lat, lng}]
+  reservations: [],
+  // GPS : { emplName : [lat,lng,notes] }
+  geo: {},
+  // UI
+  curMonth: new Date().getMonth(),
+  curYear: new Date().getFullYear(),
+  curDay: null,
+  curEmpl: null,
+  curView: 'list',
+  // Auth
+  auth: false, user: null, token: null,
+  // Modals
+  procPickerHour: null,
+  editingResId: null,
+  editingPlaceName: null,
+  // Map
+  map: null, markers: []
 };
 
-let settings = {
-  gasUrl: '',
-  driveFolderId: '',
-  chronoMins: 25,
-  bipSecs: 6
+let CFG = {
+  gasUrl: '', folderId: '1TGV87NWB5fUrLYfyxRhnyMIGxXio12j9',
+  prepMin: 3, mainMin: 30, bipSec: 6
 };
 
-// Chrono
-let chrono = {
-  remainingMs: 25*60*1000,
-  running: false,
-  intervalId: null,
-  ctxLabel: '',
-  audioCtx: null,
-  oscillator: null
-};
+/* ----- HELPERS ----- */
+const $ = id => document.getElementById(id);
+const esc = s => String(s||'').replace(/[&<>"']/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const esa = s => String(s||'').replace(/\\/g,'\\\\').replace(/'/g,"\\'");
 
-/* ========== INITIALISATION ========== */
-function init(){
-  loadSettings();
-  loadState();
-  initMonthYearSelectors();
-  preloadSampleReservations();
-  renderDays();
-  renderEmplList();
-  updateChronoDisplay();
-  updateAuthUI();
-  // Auto-save debounced
-  setInterval(()=>{ if(stateDirty){ persistLocal(); stateDirty=false; }}, 3000);
+function ymd(y,m,d){ return `${y}-${String(m+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`; }
+function parseYmd(s){ const [y,m,d]=s.split('-').map(Number); return new Date(y,m-1,d); }
+function addMin(hhmm, n){
+  const [h,m]=hhmm.split(':').map(Number);
+  const t=h*60+m+n;
+  return `${String(Math.floor(t/60)).padStart(2,'0')}:${String(t%60).padStart(2,'0')}`;
 }
 
-let stateDirty = false;
-function markDirty(){ stateDirty = true; }
-
-function loadSettings(){
-  try{
-    const s = localStorage.getItem(SETTINGS_KEY);
-    if(s) Object.assign(settings, JSON.parse(s));
-  }catch(e){}
-  document.getElementById('gasUrl').value = settings.gasUrl||'';
-  document.getElementById('driveFolderId').value = settings.driveFolderId||'';
-  document.getElementById('chronoMins').value = settings.chronoMins;
-  document.getElementById('bipSecs').value = settings.bipSecs;
-  chrono.remainingMs = settings.chronoMins*60*1000;
+/* ID anonyme stable par personne — hash léger */
+function anonId(name){
+  let h=0; for(let i=0;i<name.length;i++) h=((h<<5)-h+name.charCodeAt(i))|0;
+  return 'P-'+String(Math.abs(h)%10000).padStart(4,'0');
 }
 
-function saveSettings(){
-  settings.gasUrl = document.getElementById('gasUrl').value.trim();
-  settings.driveFolderId = document.getElementById('driveFolderId').value.trim();
-  settings.chronoMins = Math.max(1, parseInt(document.getElementById('chronoMins').value)||25);
-  settings.bipSecs = Math.max(1, parseInt(document.getElementById('bipSecs').value)||6);
-  localStorage.setItem(SETTINGS_KEY, JSON.stringify(settings));
-  chronoReset();
-  closeModal('modalSettings');
-  toast('Réglages enregistrés', 'success');
+/* Affichage RGPD : on garde le format actuel (Prénom + initiale) — déjà conforme */
+function display(name){ return name; }
+
+/* TOAST */
+function toast(msg, kind=''){
+  const t=$('toast'); t.textContent=msg; t.className='toast show '+kind;
+  setTimeout(()=>t.classList.remove('show'), 3200);
 }
 
-function loadState(){
-  try{
-    const s = localStorage.getItem(STORAGE_KEY);
-    if(s){
-      const parsed = JSON.parse(s);
-      if(parsed.reservations) state.reservations = parsed.reservations;
-    }
-  }catch(e){ console.warn('loadState', e); }
-}
+function openM(id){ $(id).classList.add('open'); }
+function closeM(id){ $(id).classList.remove('open'); }
 
+/* ----- PERSISTANCE LOCALE ----- */
 function persistLocal(){
   try{
     localStorage.setItem(STORAGE_KEY, JSON.stringify({
-      reservations: state.reservations,
-      _saved: new Date().toISOString()
+      reservations: S.reservations, geo: S.geo, savedAt: new Date().toISOString()
     }));
   }catch(e){ console.warn(e); }
 }
-
-// Seed initial : réservations déjà saisies dans le Excel d'Avril 2026
-function preloadSampleReservations(){
-  const existing = [
-    {empl:"GARE ROUTIERE place du Grand Jardin (finances publiques)",jour:3,h:"16:00",procs:["Daniel Z","Marc L"]},
-    {empl:"Av. Résistance (à côté de Franprix et du N°63)",jour:3,h:"16:30",procs:["Daniel Z","Marc L"]},
-    {empl:"GARE SNCF (côté café/restaurant)",jour:4,h:"06:30",procs:["Jean Michel D","Muriel D","Axel Z"]},
-    {empl:"Av. Résistance (à côté de Franprix et du N°63)",jour:4,h:"08:00",procs:["Jean Michel D","Muriel D"]},
-    {empl:"GARE SNCF (côté café/restaurant)",jour:4,h:"10:00",procs:["Catherine Z","Daniel Z"]},
-    {empl:"GARE ROUTIERE - Entrée du Parc",jour:4,h:"10:15",procs:["Philippe R"]},
-    {empl:"Voie piétonne - rue R. Counil (face à l'entrée SNCF)",jour:4,h:"10:15",procs:["Philippe V"]},
-    {empl:"Avenue Foch (en face à la Poste)",jour:4,h:"10:15",procs:["Lyne B"]},
-    {empl:"GARE SNCF (à côté de la Villa Max)",jour:4,h:"10:30",procs:["Catherine Z","Daniel Z"]},
-    {empl:"Pont SNCF (côté numéros impairs côté gare)",jour:4,h:"10:45",procs:["Aymeric G"]},
-    {empl:"Pont SNCF (côté numéros impairs côté gare)",jour:5,h:"10:30",procs:["Philippe V","Claude M"]},
-    {empl:"Av. Résistance - Marché côté marchand-primeurs",jour:7,h:"10:15",procs:["Pierre G","Edwige O","Anne Marie G"]},
-    {empl:"GARE ROUTIERE - Entrée du Parc",jour:7,h:"10:45",procs:["Sandra B","Pierre G"]},
-    {empl:"GARE ROUTIERE place du Grand Jardin (finances publiques)",jour:7,h:"11:30",procs:["Sandra B"]},
-    {empl:"GARE ROUTIERE (face à l'entrée gare SNCF)",jour:8,h:"07:30",procs:["Claire L"]},
-    {empl:"GARE SNCF (côté café/restaurant)",jour:10,h:"10:00",procs:["Daniel Z"]},
-    {empl:"GARE ROUTIERE (face à l'entrée gare SNCF)",jour:10,h:"11:00",procs:["Catherine Z","Sandra B"]},
-    {empl:"GARE SNCF (côté café/restaurant)",jour:10,h:"16:00",procs:["Daniel Z","Marc L"]},
-    {empl:"GARE ROUTIERE - Entrée du Parc",jour:11,h:"08:00",procs:["Claire L"]},
-    {empl:"GARE SNCF (côté café/restaurant)",jour:11,h:"10:30",procs:["Catherine Z","Lucette D","Chloé R"]},
-    {empl:"Gambetta - rond point avec la rue de l'Ilette",jour:11,h:"10:30",procs:["Robert I","Rosemarie H"]},
-    {empl:"Avenue Foch (en face à la Poste)",jour:10,h:"10:30",procs:["Philippe V"]},
-    {empl:"Pont SNCF (côté numéros impairs côté gare)",jour:11,h:"10:30",procs:["Jocelyne M"]},
-    {empl:"Av. Résistance (entre le 1 et 3 - Monument)",jour:11,h:"10:30",procs:["Marius B","Thierry V","Sandra B"]},
-    {empl:"Pont SNCF (côté numéros pairs)",jour:11,h:"11:30",procs:["Philippe D"]},
-    {empl:"Av. Résistance - Entrée du Parc place Cala (grille fer forgé)",jour:14,h:"10:15",procs:["Catherine Z"]},
-    {empl:"GARE SNCF (côté café/restaurant)",jour:14,h:"10:15",procs:["Anne Marie G","Edwige O"]},
-  ];
-  const key = "2026-04";
-  if(!state.reservations[key]){
-    state.reservations[key] = {};
-    existing.forEach(r=>{
-      // ne garde que les proclamateurs connus dans la liste active
-      const procs = r.procs.filter(p => PROCLAMATEURS.includes(p));
-      if(procs.length===0) return;
-      if(!state.reservations[key][r.jour]) state.reservations[key][r.jour] = {};
-      if(!state.reservations[key][r.jour][r.empl]) state.reservations[key][r.jour][r.empl] = {};
-      state.reservations[key][r.jour][r.empl][r.h] = procs.slice(0,MAX_PROCS_PAR_CRENEAU);
-    });
-    persistLocal();
-  }
-}
-
-function initMonthYearSelectors(){
-  const selM = document.getElementById('selMonth');
-  const selY = document.getElementById('selYear');
-  MOIS_NOMS.forEach((m,i)=>{
-    const o = new Option(m, i);
-    selM.add(o);
-  });
-  const thisY = new Date().getFullYear();
-  for(let y=thisY-1; y<=thisY+2; y++){
-    selY.add(new Option(y, y));
-  }
-  selM.value = state.currentMonth;
-  selY.value = state.currentYear;
-}
-
-function moisKey(){
-  const m = parseInt(document.getElementById('selMonth').value);
-  const y = parseInt(document.getElementById('selYear').value);
-  return `${y}-${String(m+1).padStart(2,'0')}`;
-}
-
-function onMonthChange(){
-  state.currentDay = null;
-  state.currentEmpl = null;
-  renderDays();
-  renderEmplList();
-  updateDaySummary();
-  updateDayTitle();
-}
-
-/* ========== RENDER CALENDRIER ========== */
-function renderDays(){
-  const m = parseInt(document.getElementById('selMonth').value);
-  const y = parseInt(document.getElementById('selYear').value);
-  state.currentMonth = m;
-  state.currentYear = y;
-
-  const grid = document.getElementById('daysGrid');
-  grid.innerHTML = '';
-
-  const firstDay = new Date(y, m, 1);
-  let offset = firstDay.getDay() - 1; // lundi = 0
-  if(offset < 0) offset = 6;
-  const daysInMonth = new Date(y, m+1, 0).getDate();
-
-  // cellules vides avant le 1er
-  for(let i=0; i<offset; i++){
-    const c = document.createElement('div');
-    c.className = 'day-cell disabled';
-    grid.appendChild(c);
-  }
-
-  const key = moisKey();
-  const resMois = state.reservations[key] || {};
-  let countMonth = 0;
-
-  for(let d=1; d<=daysInMonth; d++){
-    const c = document.createElement('div');
-    c.className = 'day-cell';
-    c.dataset.day = d;
-    c.innerHTML = `<span>${d}</span>`;
-    if(resMois[d]){
-      const nb = Object.values(resMois[d]).reduce((s,empl)=>s+Object.keys(empl).length,0);
-      if(nb > 0){
-        c.classList.add('has-res');
-        c.innerHTML += `<span class="badge">${nb}</span>`;
-        countMonth += nb;
-      }
+function loadLocal(){
+  try{
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if(raw){
+      const d = JSON.parse(raw);
+      if(d.reservations) S.reservations = d.reservations;
+      if(d.geo) S.geo = d.geo;
     }
-    if(state.currentDay === d) c.classList.add('selected');
-    c.onclick = () => selectDay(d);
-    grid.appendChild(c);
+  }catch(e){}
+}
+function loadCfg(){
+  try{
+    const raw = localStorage.getItem(CFG_KEY);
+    if(raw) Object.assign(CFG, JSON.parse(raw));
+  }catch(e){}
+  $('cfgGasUrl').value = CFG.gasUrl||'';
+  $('cfgFolderId').value = CFG.folderId||'';
+  $('cfgPrepMin').value = CFG.prepMin;
+  $('cfgMainMin').value = CFG.mainMin;
+  $('cfgBipSec').value = CFG.bipSec;
+}
+
+function saveConfig(){
+  CFG.gasUrl = $('cfgGasUrl').value.trim();
+  CFG.folderId = $('cfgFolderId').value.trim();
+  localStorage.setItem(CFG_KEY, JSON.stringify(CFG));
+  toast('Configuration enregistrée','ok');
+}
+function saveTimerCfg(){
+  CFG.prepMin = Math.max(0, +$('cfgPrepMin').value || 3);
+  CFG.mainMin = Math.max(1, +$('cfgMainMin').value || 30);
+  CFG.bipSec = Math.max(1, +$('cfgBipSec').value || 6);
+  localStorage.setItem(CFG_KEY, JSON.stringify(CFG));
+  chronoReset();
+  toast('Paramètres chrono enregistrés','ok');
+}
+
+function purgeLocal(){
+  if(!confirm('Effacer toutes les données locales ? (le contenu sur Drive n\'est PAS touché)')) return;
+  localStorage.removeItem(STORAGE_KEY);
+  S.reservations = []; S.geo = {...GEO_DEFAULT};
+  preseedIfEmpty();
+  renderAll();
+  toast('Données locales purgées','ok');
+}
+
+/* ----- INITIALISATION DONNÉES (pré-seed) ----- */
+function preseedIfEmpty(){
+  if(S.reservations.length > 0) return;
+  PRESEED.forEach(r => {
+    r.procs.forEach(p => {
+      // garder même les noms inconnus comme "Proclamateur extérieur" (ajouté à la liste)
+      addReservation({
+        date: ymd(2026, 4, r.jour), // mois index 4 = mai
+        empl: r.empl,
+        heure: r.h,
+        proc: p,
+        status: 'planned',
+        notes: '',
+        silent: true
+      });
+    });
+  });
+  S.geo = Object.assign({}, GEO_DEFAULT, S.geo);
+  persistLocal();
+}
+
+/* ----- CRUD RÉSERVATIONS ----- */
+function addReservation({date, empl, heure, proc, status='planned', notes='', silent=false}){
+  // Vérifier doublon strict : même proc sur même empl à même heure le même jour
+  const dup = S.reservations.find(r => r.date===date && r.empl===empl && r.heure===heure && r.proc===proc);
+  if(dup){ if(!silent) toast(proc+' est déjà inscrit sur ce créneau','wn'); return null; }
+  // Compter procs déjà sur ce créneau
+  const occupied = S.reservations.filter(r => r.date===date && r.empl===empl && r.heure===heure && r.status!=='cancelled');
+  if(occupied.length >= MAX_PROCS){ if(!silent) toast('Maximum '+MAX_PROCS+' personnes / créneau','wn'); return null; }
+  const r = {
+    id: 'R-'+Date.now().toString(36)+Math.random().toString(36).slice(2,6),
+    date, empl, heure, heureEnd: addMin(heure, CFG.mainMin||30),
+    proc, status, notes,
+    createdAt: new Date().toISOString(),
+    createdBy: S.user || 'anonymous'
+  };
+  S.reservations.push(r);
+  if(!silent){ persistLocal(); }
+  return r;
+}
+
+function removeReservation(id){
+  const i = S.reservations.findIndex(r => r.id===id);
+  if(i>=0){ S.reservations.splice(i,1); persistLocal(); }
+}
+
+function updateReservation(id, patch){
+  const r = S.reservations.find(x => x.id===id);
+  if(!r) return;
+  Object.assign(r, patch);
+  if(patch.heure) r.heureEnd = addMin(patch.heure, CFG.mainMin||30);
+  r.updatedAt = new Date().toISOString();
+  persistLocal();
+}
+
+/* Trouver tous les procs pour empl+date+heure */
+function getProcsAt(date, empl, heure){
+  return S.reservations.filter(r => r.date===date && r.empl===empl && r.heure===heure && r.status!=='cancelled');
+}
+
+/* ----- NAVIGATION ONGLETS ----- */
+function goTab(tab){
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  $('screen-'+tab).classList.add('active');
+  document.querySelectorAll('nav.tabs button').forEach(b => b.classList.toggle('active', b.dataset.tab===tab));
+  if(tab==='dashboard') renderDashboard();
+  if(tab==='reservations') { renderCalendar(); renderEmplList(); }
+  if(tab==='map') setTimeout(initMap, 50);
+  if(tab==='people') renderPeople();
+  if(tab==='places') renderPlaces();
+  if(tab==='stats') renderStats();
+  window.scrollTo(0,0);
+}
+
+/* ----- INIT GLOBALE ----- */
+function init(){
+  S.geo = Object.assign({}, GEO_DEFAULT);
+  loadCfg();
+  loadLocal();
+  preseedIfEmpty();
+  initQuickReserve();
+  // Selecteurs mois/année
+  MOIS.forEach((m,i)=> $('selMonth').add(new Option(m,i)));
+  const yNow = new Date().getFullYear();
+  for(let y=yNow-1; y<=yNow+2; y++) $('selYear').add(new Option(y,y));
+  $('selMonth').value = S.curMonth;
+  $('selYear').value = S.curYear;
+  $('statsRef').value = ymd(new Date().getFullYear(), new Date().getMonth(), new Date().getDate());
+  updateAuthUI();
+  renderAll();
+  // Sauvegarde auto débouncée
+  setInterval(()=>{ if(dirty){ persistLocal(); dirty=false; }}, 3000);
+}
+
+let dirty=false;
+function markDirty(){ dirty=true; }
+
+function renderAll(){
+  renderDashboard();
+  renderCalendar();
+  renderEmplList();
+}
+
+/* ============================================================
+   TABLEAU DE BORD
+   ============================================================ */
+function renderDashboard(){
+  const today = new Date();
+  const todayStr = ymd(today.getFullYear(), today.getMonth(), today.getDate());
+  $('todayDate').textContent = JOURS_L[today.getDay()] + ' ' + today.getDate() + ' ' + MOIS[today.getMonth()].toLowerCase();
+  $('dashPeriod').textContent = 'tous mois confondus';
+
+  $('dashTotal').textContent = S.reservations.filter(r=>r.status!=='cancelled').length;
+  const totalMin = S.reservations.filter(r=>r.status!=='cancelled').length * (CFG.mainMin||30);
+  $('dashHours').textContent = Math.round(totalMin/60) + 'h';
+  $('dashPeople').textContent = new Set(S.reservations.map(r=>r.proc)).size;
+  $('dashPlaces').textContent = new Set(S.reservations.map(r=>r.empl)).size;
+
+  // Aujourd'hui
+  const today_res = S.reservations.filter(r => r.date===todayStr && r.status!=='cancelled')
+    .sort((a,b)=>a.heure.localeCompare(b.heure));
+  if(today_res.length===0){
+    $('todayList').innerHTML = '<p class="empty">Aucune réservation aujourd\'hui.</p>';
+  } else {
+    // regrouper par heure+empl
+    const groups = {};
+    today_res.forEach(r => {
+      const k = r.heure+'|'+r.empl;
+      if(!groups[k]) groups[k]={heure:r.heure, empl:r.empl, procs:[]};
+      groups[k].procs.push(r.proc);
+    });
+    $('todayList').innerHTML = Object.values(groups).sort((a,b)=>a.heure.localeCompare(b.heure)).map(g=>`
+      <div class="slot has">
+        <span class="t">${g.heure}</span>
+        <div>
+          <div style="font-weight:600;font-size:.78rem">${esc(g.empl)}</div>
+          <div class="ps" style="margin-top:3px">${g.procs.map(p=>`<span class="chip">${esc(display(p))}</span>`).join('')}</div>
+        </div>
+        <button class="btn gh sm" style="background:var(--sf2);color:var(--p)" onclick="startChronoFor('${esa(g.heure)}','${esa(g.empl)}','${esa(g.procs.join(', '))}')">⏱️</button>
+      </div>
+    `).join('');
   }
 
-  document.getElementById('statMonth').textContent = countMonth;
+  // Top emplacements du mois courant
+  const m = new Date().getMonth(), y = new Date().getFullYear();
+  const mStart = ymd(y,m,1), mEnd = ymd(y,m,31);
+  const monthRes = S.reservations.filter(r => r.date>=mStart && r.date<=mEnd && r.status!=='cancelled');
+  const counts = {};
+  monthRes.forEach(r => counts[r.empl] = (counts[r.empl]||0)+1);
+  const top = Object.entries(counts).sort((a,b)=>b[1]-a[1]).slice(0,5);
+  if(top.length===0){
+    $('dashTopPlaces').innerHTML='<p class="empty">Pas encore de données ce mois.</p>';
+  } else {
+    $('dashTopPlaces').innerHTML = top.map(([e,n],i)=>`
+      <div class="row no-hover" style="cursor:default">
+        <span>${i+1}. ${esc(e)}</span>
+        <span class="cnt ok">${n}</span>
+      </div>`).join('');
+  }
+}
+
+/* ============================================================
+   RÉSERVATIONS — Calendrier + Liste
+   ============================================================ */
+function onMonthChange(){
+  S.curMonth = +$('selMonth').value;
+  S.curYear = +$('selYear').value;
+  S.curDay = null;
+  S.curEmpl = null;
+  renderCalendar();
+  renderEmplList();
+}
+
+function goToday(){
+  const t = new Date();
+  S.curMonth = t.getMonth(); S.curYear = t.getFullYear(); S.curDay = t.getDate();
+  $('selMonth').value = S.curMonth; $('selYear').value = S.curYear;
+  renderCalendar(); renderEmplList();
+  goTab('reservations');
+}
+
+function renderCalendar(){
+  const m = S.curMonth, y = S.curYear;
+  const g = $('calGrid'); g.innerHTML='';
+  const first = new Date(y,m,1);
+  let off = first.getDay()-1; if(off<0) off=6;
+  const ndays = new Date(y,m+1,0).getDate();
+  for(let i=0;i<off;i++){ const c=document.createElement('div'); c.className='cal-day disabled'; g.appendChild(c); }
+
+  // compter résa par jour
+  const byDay = {};
+  S.reservations.filter(r=>r.status!=='cancelled').forEach(r=>{
+    const d = parseYmd(r.date);
+    if(d.getMonth()===m && d.getFullYear()===y){
+      byDay[d.getDate()] = (byDay[d.getDate()]||0)+1;
+    }
+  });
+
+  const today = new Date();
+  let total=0;
+  for(let d=1; d<=ndays; d++){
+    const c=document.createElement('div'); c.className='cal-day'; c.dataset.day=d;
+    c.innerHTML=`<span>${d}</span>`;
+    const n = byDay[d]||0;
+    if(n>0){ c.classList.add('has'); c.innerHTML+=`<span class="b">${n}</span>`; total+=n; }
+    if(S.curDay===d) c.classList.add('sel');
+    if(today.getFullYear()===y && today.getMonth()===m && today.getDate()===d) c.classList.add('today');
+    c.onclick = ()=>selectDay(d);
+    g.appendChild(c);
+  }
+  $('stMonth').textContent = total;
   updateDayStats();
 }
 
 function selectDay(d){
-  state.currentDay = d;
-  state.currentEmpl = null;
-  renderDays();
-  renderEmplList();
-  updateDayTitle();
-  updateDaySummary();
-  updateDayStats();
-}
-
-function updateDayTitle(){
-  const el = document.getElementById('dayTitle');
-  if(state.currentDay){
-    const dt = new Date(state.currentYear, state.currentMonth, state.currentDay);
-    const jours = ['Dimanche','Lundi','Mardi','Mercredi','Jeudi','Vendredi','Samedi'];
-    el.textContent = `— ${jours[dt.getDay()]} ${state.currentDay} ${MOIS_NOMS[state.currentMonth].toLowerCase()}`;
-  } else {
-    el.textContent = '— sélectionnez un jour';
-  }
+  S.curDay = d; S.curEmpl = null;
+  renderCalendar(); renderEmplList();
 }
 
 function updateDayStats(){
-  const key = moisKey();
-  const res = (state.reservations[key]||{})[state.currentDay]||{};
-  let count = 0;
-  Object.values(res).forEach(empl => count += Object.keys(empl).length);
-  document.getElementById('statDay').textContent = count;
-  const emplOccupes = Object.keys(res).length;
-  document.getElementById('statFree').textContent = EMPLACEMENTS.length - emplOccupes;
+  if(!S.curDay){ $('stDay').textContent='0'; $('stFree').textContent=EMPLACEMENTS.length; return; }
+  const date = ymd(S.curYear, S.curMonth, S.curDay);
+  const day = S.reservations.filter(r=>r.date===date && r.status!=='cancelled');
+  $('stDay').textContent = day.length;
+  $('stFree').textContent = EMPLACEMENTS.length - new Set(day.map(r=>r.empl)).size;
 }
 
-/* ========== RENDER LISTE EMPLACEMENTS ========== */
 function renderEmplList(){
-  const list = document.getElementById('emplList');
-  const slotsArea = document.getElementById('slotsArea');
-  const search = (document.getElementById('searchEmpl').value||'').toLowerCase();
+  const list = $('emplList');
+  const slots = $('slotsArea');
+  const q = ($('searchAll').value||'').toLowerCase();
 
-  if(state.view === 'schedule'){ renderScheduleView(); return; }
-
-  if(!state.currentDay){
-    list.innerHTML = '<p style="color:var(--text-muted);font-size:.85rem;padding:20px;text-align:center">Sélectionnez d\'abord un jour ci-dessus.</p>';
-    slotsArea.innerHTML = '';
+  if(!S.curDay){
+    list.innerHTML = '<p class="empty">Sélectionnez un jour ci-dessus.</p>';
+    slots.innerHTML = '';
+    $('dayTitle').textContent = '';
     return;
   }
+  const date = ymd(S.curYear, S.curMonth, S.curDay);
+  const dt = new Date(S.curYear, S.curMonth, S.curDay);
+  $('dayTitle').textContent = `· ${JOURS_L[dt.getDay()]} ${S.curDay} ${MOIS[S.curMonth].toLowerCase()}`;
 
-  const key = moisKey();
-  const resDay = (state.reservations[key]||{})[state.currentDay]||{};
-
-  const filtered = EMPLACEMENTS.filter(e => e.toLowerCase().includes(search));
-
-  if(filtered.length === 0){
-    list.innerHTML = '<p style="color:var(--text-muted);font-size:.85rem;padding:10px">Aucun emplacement correspondant.</p>';
-    slotsArea.innerHTML = '';
-    return;
+  let filtered = EMPLACEMENTS.filter(e => e.toLowerCase().includes(q));
+  // Si on cherche aussi par personne :
+  if(q){
+    const matching = new Set();
+    S.reservations.filter(r => r.date===date && r.proc.toLowerCase().includes(q))
+      .forEach(r => matching.add(r.empl));
+    filtered = [...new Set([...filtered, ...matching])];
   }
 
+  if(filtered.length===0){
+    list.innerHTML='<p class="empty">Aucun résultat.</p>';
+    slots.innerHTML='';
+    return;
+  }
   list.innerHTML = filtered.map(e=>{
-    const nbSlots = resDay[e] ? Object.keys(resDay[e]).length : 0;
-    const active = state.currentEmpl === e ? 'active' : '';
-    const countClass = nbSlots === 0 ? 'zero' : '';
-    return `<div class="empl-row ${active}" onclick="selectEmpl('${escapeAttr(e)}')">
-      <span>${escapeHtml(e)}</span>
-      <span class="count ${countClass}">${nbSlots} créneau${nbSlots>1?'x':''}</span>
+    const nSlots = new Set(S.reservations.filter(r=>r.date===date && r.empl===e && r.status!=='cancelled').map(r=>r.heure)).size;
+    const cls = S.curEmpl===e ? 'active' : '';
+    const ccls = nSlots===0 ? 'zero' : (nSlots>=3 ? 'ok' : '');
+    return `<div class="row ${cls}" onclick="selectEmpl('${esa(e)}')">
+      <span>${esc(e)}</span><span class="cnt ${ccls}">${nSlots} créneau${nSlots>1?'x':''}</span>
     </div>`;
   }).join('');
 
-  if(state.currentEmpl && !filtered.includes(state.currentEmpl)){
-    state.currentEmpl = null;
-  }
   renderSlots();
 }
 
-function selectEmpl(e){
-  state.currentEmpl = e;
-  renderEmplList();
-}
+function selectEmpl(e){ S.curEmpl = e; renderEmplList(); }
 
 function renderSlots(){
-  const slotsArea = document.getElementById('slotsArea');
-  if(!state.currentEmpl){
-    slotsArea.innerHTML = '<p style="color:var(--text-muted);font-size:.85rem;padding:10px;text-align:center">👉 Cliquez sur un emplacement pour voir ses créneaux.</p>';
-    return;
-  }
-  const key = moisKey();
-  const resEmpl = ((state.reservations[key]||{})[state.currentDay]||{})[state.currentEmpl]||{};
+  const slots = $('slotsArea');
+  if(!S.curEmpl){ slots.innerHTML='<p class="empty">👉 Cliquez sur un emplacement.</p>'; return; }
+  const date = ymd(S.curYear, S.curMonth, S.curDay);
+  const allEmplRes = S.reservations.filter(r => r.date===date && r.empl===S.curEmpl);
 
-  slotsArea.innerHTML = `<h3 style="margin-top:14px">⏰ Créneaux — ${escapeHtml(state.currentEmpl)}</h3>` +
-    HORAIRES.map(h=>{
-      const procs = resEmpl[h] || [];
-      const hasProc = procs.length > 0;
-      const full = procs.length >= MAX_PROCS_PAR_CRENEAU;
-      return `<div class="slot ${hasProc?'has-proc':''}">
-        <span class="time">${h}</span>
-        <div class="procs">
-          ${procs.map(p=>`<span class="proc-chip">${escapeHtml(p)}<span class="x" onclick="removeProc('${escapeAttr(h)}','${escapeAttr(p)}')">×</span></span>`).join('')}
-          ${procs.length === 0 ? '<span style="color:var(--text-muted);font-size:.8rem;font-style:italic">— libre —</span>' : ''}
-        </div>
-        <div class="actions">
-          ${!full ? `<button class="btn btn-sm" onclick="openProcPicker('${escapeAttr(h)}')">+</button>` : '<span class="pill full">complet</span>'}
-          ${hasProc ? `<button class="btn btn-sm btn-ghost" style="background:var(--surface-2);color:var(--primary)" onclick="startChronoForSlot('${escapeAttr(h)}')">⏱️</button>` : ''}
-        </div>
-      </div>`;
+  let html = `<h3>⏰ ${esc(S.curEmpl)}</h3>`;
+  html += HORAIRES.map(h => {
+    const procs = allEmplRes.filter(r => r.heure===h && r.status!=='cancelled');
+    const hasC = procs.length>0;
+    const full = procs.length>=MAX_PROCS;
+    return `<div class="slot ${hasC?'has':''}">
+      <span class="t">${h}</span>
+      <div class="ps">${procs.map(r=>`<span class="chip">${esc(display(r.proc))}<span class="x" title="Modifier" onclick="event.stopPropagation();editRes('${r.id}')">⚙</span><span class="x" onclick="event.stopPropagation();removeProc('${r.id}')">×</span></span>`).join('')}
+        ${procs.length===0 ? '<span class="muted" style="margin:0">— libre —</span>' : ''}
+      </div>
+      <div class="a">
+        ${!full ? `<button class="btn sm" onclick="openProcPicker('${esa(h)}')">+</button>` : '<span class="tag ko">complet</span>'}
+        ${hasC ? `<button class="btn sm gh" style="background:var(--sf2);color:var(--p)" onclick="startChronoFor('${esa(h)}','${esa(S.curEmpl)}','${esa(procs.map(r=>r.proc).join(', '))}')">⏱️</button>` : ''}
+      </div>
+    </div>`;
+  }).join('');
+  slots.innerHTML = html;
+}
+
+/* === Picker proc === */
+function openProcPicker(h){
+  if(!S.auth){ toast('Connectez-vous pour modifier','wn'); openM('mAuth'); return; }
+  S.procPickerHour = h;
+  const dt = new Date(S.curYear, S.curMonth, S.curDay);
+  $('mProcCtx').innerHTML = `📍 <b>${esc(S.curEmpl)}</b><br>📅 ${JOURS_L[dt.getDay()]} ${S.curDay} ${MOIS[S.curMonth]} · ⏰ <b>${h}</b>`;
+  $('mProcSearch').value=''; renderProcGrid(); openM('mProc');
+}
+
+function renderProcGrid(){
+  const q = ($('mProcSearch').value||'').toLowerCase();
+  const date = ymd(S.curYear, S.curMonth, S.curDay);
+  const already = new Set(getProcsAt(date, S.curEmpl, S.procPickerHour).map(r=>r.proc));
+  const full = already.size >= MAX_PROCS;
+  $('mProcGrid').innerHTML = PROCLAMATEURS
+    .filter(p => p.toLowerCase().includes(q))
+    .map(p => {
+      const isIn = already.has(p);
+      const dis = full && !isIn ? 'dis' : '';
+      return `<button class="pbtn ${isIn?'sel':''} ${dis}" onclick="toggleProc('${esa(p)}')"><span>${isIn?'✓ ':''}${esc(display(p))}</span><span class="sub">${anonId(p)}</span></button>`;
     }).join('');
 }
 
-/* ========== VUE CHRONOLOGIQUE ========== */
-function setView(v){
-  state.view = v;
-  document.querySelectorAll('.tab').forEach(t => t.classList.toggle('active', t.dataset.view === v));
-  document.getElementById('emplListView').classList.toggle('hidden', v !== 'list');
-  document.getElementById('scheduleView').classList.toggle('hidden', v !== 'schedule');
-  if(v === 'schedule') renderScheduleView();
-  else renderEmplList();
+function toggleProc(name){
+  const date = ymd(S.curYear, S.curMonth, S.curDay);
+  const existing = S.reservations.find(r => r.date===date && r.empl===S.curEmpl && r.heure===S.procPickerHour && r.proc===name);
+  if(existing){
+    removeReservation(existing.id);
+    toast(name+' retiré','ok');
+  } else {
+    const r = addReservation({date, empl:S.curEmpl, heure:S.procPickerHour, proc:name, status:'planned', notes:''});
+    if(r) toast(name+' ajouté','ok');
+  }
+  renderProcGrid(); renderSlots(); renderCalendar(); updateDayStats();
 }
 
-function renderScheduleView(){
-  const container = document.getElementById('scheduleList');
-  if(!state.currentDay){
-    container.innerHTML = '<p style="color:var(--text-muted);padding:20px;text-align:center">Sélectionnez un jour.</p>';
-    return;
-  }
-  const key = moisKey();
-  const resDay = (state.reservations[key]||{})[state.currentDay]||{};
+function removeProc(id){
+  if(!S.auth){ toast('Connectez-vous pour modifier','wn'); return; }
+  if(!confirm('Retirer ce créneau ?')) return;
+  removeReservation(id);
+  renderSlots(); renderCalendar(); updateDayStats();
+  toast('Créneau retiré','ok');
+}
 
-  // Construire une liste plate [h, empl, procs]
-  const list = [];
-  Object.entries(resDay).forEach(([empl,slots])=>{
-    Object.entries(slots).forEach(([h,procs])=>{
-      if(procs && procs.length>0) list.push({h,empl,procs});
+/* === Modifier une réservation === */
+function editRes(id){
+  if(!S.auth){ toast('Connectez-vous pour modifier','wn'); return; }
+  const r = S.reservations.find(x=>x.id===id);
+  if(!r) return;
+  S.editingResId = id;
+  $('mERTitle').innerHTML = `✏️ ${esc(display(r.proc))} — ${esc(r.empl)}<button class="cl" onclick="closeM('mEditRes')">×</button>`;
+  const hSel = $('eRHour'); hSel.innerHTML='';
+  HORAIRES.forEach(h => hSel.add(new Option(h, h)));
+  hSel.value = r.heure;
+  $('eRStatus').value = r.status;
+  $('eRNotes').value = r.notes||'';
+  openM('mEditRes');
+}
+
+function saveEditRes(){
+  const r = S.reservations.find(x=>x.id===S.editingResId);
+  if(!r) return;
+  const newH = $('eRHour').value;
+  // Si changement d'heure : vérifier doublon
+  if(newH !== r.heure){
+    const dup = S.reservations.find(x => x.id!==r.id && x.date===r.date && x.empl===r.empl && x.heure===newH && x.proc===r.proc);
+    if(dup){ toast('Doublon détecté','ko'); return; }
+    const others = S.reservations.filter(x => x.id!==r.id && x.date===r.date && x.empl===r.empl && x.heure===newH && x.status!=='cancelled').length;
+    if(others>=MAX_PROCS){ toast('Créneau complet','ko'); return; }
+  }
+  updateReservation(r.id, { heure:newH, status:$('eRStatus').value, notes:$('eRNotes').value });
+  closeM('mEditRes');
+  renderSlots(); renderCalendar(); updateDayStats(); renderDashboard();
+  toast('Modifié','ok');
+}
+
+function deleteRes(){
+  if(!confirm('Supprimer définitivement ?')) return;
+  removeReservation(S.editingResId);
+  closeM('mEditRes'); renderSlots(); renderCalendar(); updateDayStats();
+  toast('Supprimé','ok');
+}
+
+/* ============================================================
+   CARTE LEAFLET
+   ============================================================ */
+function initMap(){
+  if(S.map){ S.map.invalidateSize(); refreshMarkers(); return; }
+  S.map = L.map('mapView',{ scrollWheelZoom:true }).setView([48.8780, 2.5953], 14);
+  L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png',{
+    attribution:'© OpenStreetMap',
+    maxZoom:19
+  }).addTo(S.map);
+  refreshMarkers();
+}
+
+function refreshMarkers(){
+  S.markers.forEach(m => S.map.removeLayer(m));
+  S.markers = [];
+  const date = S.curDay ? ymd(S.curYear, S.curMonth, S.curDay) : null;
+  EMPLACEMENTS.forEach(e=>{
+    const coords = (S.geo[e] || GEO_DEFAULT[e] || [48.8780,2.5953]).slice(0,2);
+    let resvCount = 0;
+    if(date){
+      resvCount = new Set(S.reservations.filter(r => r.date===date && r.empl===e && r.status!=='cancelled').map(r=>r.heure)).size;
+    }
+    const procs = date ? S.reservations.filter(r => r.date===date && r.empl===e && r.status!=='cancelled') : [];
+    const color = resvCount===0 ? '#94a3b8' : (resvCount>=3 ? '#10b981' : '#f59e0b');
+    const ic = L.divIcon({
+      className:'',
+      html:`<div style="background:${color};color:#fff;width:26px;height:26px;border-radius:50% 50% 50% 0;transform:rotate(-45deg);border:2px solid #fff;box-shadow:0 2px 6px rgba(0,0,0,.3);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:.7rem"><span style="transform:rotate(45deg)">${resvCount||'·'}</span></div>`,
+      iconSize:[26,26], iconAnchor:[13,26]
     });
+    const m = L.marker(coords, {icon: ic}).addTo(S.map);
+    const procsHtml = procs.length ? procs.sort((a,b)=>a.heure.localeCompare(b.heure)).map(r=>`<li><b>${r.heure}</b> · ${esc(display(r.proc))}</li>`).join('') : '<li class="muted">Aucune réservation</li>';
+    m.bindPopup(`<b>${esc(e)}</b><br><span style="font-size:.7rem;color:#6b7280">${coords[0].toFixed(5)}, ${coords[1].toFixed(5)}</span><br>${date?'<small>Jour : '+date+'</small>':''}<ul style="margin:6px 0 0;padding-left:18px">${procsHtml}</ul><button class="btn sm out" style="margin-top:6px" onclick="editPlaceModal('${esa(e)}')">📝 Coordonnées</button>`);
+    S.markers.push(m);
   });
-  list.sort((a,b)=> a.h.localeCompare(b.h) || a.empl.localeCompare(b.empl));
+}
 
-  if(list.length === 0){
-    container.innerHTML = '<p style="color:var(--text-muted);padding:20px;text-align:center;font-style:italic">Aucune réservation pour ce jour.</p>';
-    return;
-  }
-  container.innerHTML = list.map(r=>`
-    <div class="slot has-proc">
-      <span class="time">${r.h}</span>
-      <div>
-        <div style="font-weight:600;font-size:.85rem">${escapeHtml(r.empl)}</div>
-        <div class="procs" style="margin-top:4px">
-          ${r.procs.map(p=>`<span class="proc-chip">${escapeHtml(p)}</span>`).join('')}
-        </div>
-      </div>
-      <button class="btn btn-sm btn-ghost" style="background:var(--surface-2);color:var(--primary)" onclick="startChronoExt('${escapeAttr(r.h)}','${escapeAttr(r.empl)}','${escapeAttr(r.procs.join(', '))}')">⏱️</button>
+/* ============================================================
+   PERSONNES
+   ============================================================ */
+function renderPeople(){
+  const q = ($('searchPeople').value||'').toLowerCase();
+  const sort = $('peopleSort').value;
+  $('peopleCount').textContent = '(' + PROCLAMATEURS.length + ')';
+
+  // calcul stats par personne
+  const items = PROCLAMATEURS
+    .filter(p => p.toLowerCase().includes(q))
+    .map(p => {
+      const res = S.reservations.filter(r => r.proc===p && r.status!=='cancelled');
+      const hours = (res.length * (CFG.mainMin||30)) / 60;
+      return { name:p, anon:anonId(p), resv:res.length, hours };
+    });
+  if(sort==='resv') items.sort((a,b)=>b.resv-a.resv || a.name.localeCompare(b.name));
+  else if(sort==='hours') items.sort((a,b)=>b.hours-a.hours || a.name.localeCompare(b.name));
+  else items.sort((a,b)=>a.name.localeCompare(b.name));
+
+  if(items.length===0){ $('peopleList').innerHTML='<p class="empty">Aucun résultat.</p>'; return; }
+  $('peopleList').innerHTML = items.map(it=>`
+    <div class="row no-hover" style="cursor:default">
+      <span><b>${esc(display(it.name))}</b> <span class="tag">${it.anon}</span></span>
+      <span><span class="cnt">${it.resv} résa</span> <span class="tag ok">${it.hours.toFixed(1)} h</span></span>
     </div>
   `).join('');
 }
 
-/* ========== AJOUT / SUPPRESSION PROCLAMATEURS ========== */
-let procPickerSlot = null;
-function openProcPicker(h){
-  if(!state.authenticated){
-    toast('Connectez-vous en admin pour modifier', 'warning');
-    return;
-  }
-  procPickerSlot = h;
-  document.getElementById('modalProcCtx').innerHTML =
-    `📍 <b>${escapeHtml(state.currentEmpl)}</b><br>📅 ${state.currentDay} ${MOIS_NOMS[state.currentMonth]} · ⏰ <b>${h}</b>`;
-  document.getElementById('searchProc').value = '';
-  renderProcGrid();
-  openModal('modalProc');
+/* ============================================================
+   EMPLACEMENTS
+   ============================================================ */
+function renderPlaces(){
+  const q = ($('searchPlaces').value||'').toLowerCase();
+  const sort = $('placesSort').value;
+  $('placesCount').textContent = '(' + EMPLACEMENTS.length + ')';
+  const items = EMPLACEMENTS
+    .filter(e => e.toLowerCase().includes(q))
+    .map(e => {
+      const res = S.reservations.filter(r => r.empl===e && r.status!=='cancelled');
+      return { name:e, resv:res.length, hours:(res.length*(CFG.mainMin||30))/60, coords:S.geo[e]||GEO_DEFAULT[e]||[0,0] };
+    });
+  if(sort==='resv') items.sort((a,b)=>b.resv-a.resv || a.name.localeCompare(b.name));
+  else if(sort==='hours') items.sort((a,b)=>b.hours-a.hours || a.name.localeCompare(b.name));
+  else items.sort((a,b)=>a.name.localeCompare(b.name));
+
+  if(items.length===0){ $('placesList').innerHTML='<p class="empty">Aucun résultat.</p>'; return; }
+  $('placesList').innerHTML = items.map(it=>`
+    <div class="row">
+      <span onclick="editPlaceModal('${esa(it.name)}')">
+        <b>${esc(it.name)}</b><br>
+        <span class="muted">📌 ${it.coords[0].toFixed(5)}, ${it.coords[1].toFixed(5)}</span>
+      </span>
+      <span>
+        <span class="cnt">${it.resv}</span>
+        <span class="tag ok">${it.hours.toFixed(1)} h</span>
+        <button class="btn sm out" onclick="editPlaceModal('${esa(it.name)}')">📝</button>
+      </span>
+    </div>
+  `).join('');
 }
 
-function renderProcGrid(){
-  const grid = document.getElementById('procGrid');
-  const search = (document.getElementById('searchProc').value||'').toLowerCase();
-  const key = moisKey();
-  const already = (((state.reservations[key]||{})[state.currentDay]||{})[state.currentEmpl]||{})[procPickerSlot]||[];
-  grid.innerHTML = PROCLAMATEURS.filter(p=>p.toLowerCase().includes(search)).map(p=>{
-    const isIn = already.includes(p);
-    return `<button class="proc-btn ${isIn?'selected':''}" onclick="toggleProc('${escapeAttr(p)}')">${isIn?'✓ ':''}${escapeHtml(p)}</button>`;
-  }).join('');
+function editPlaceModal(name){
+  if(!S.auth){ toast('Connectez-vous pour modifier','wn'); openM('mAuth'); return; }
+  S.editingPlaceName = name;
+  const coords = S.geo[name] || GEO_DEFAULT[name] || [48.8780, 2.5953];
+  $('mEPTitle').innerHTML = '📍 ' + esc(name) + '<button class="cl" onclick="closeM(\'mEditPlace\')">×</button>';
+  $('ePName').value = name;
+  $('ePLat').value = coords[0];
+  $('ePLng').value = coords[1];
+  $('ePNotes').value = coords[2] || '';
+  openM('mEditPlace');
 }
 
-function toggleProc(name){
-  const key = moisKey();
-  if(!state.reservations[key]) state.reservations[key]={};
-  if(!state.reservations[key][state.currentDay]) state.reservations[key][state.currentDay]={};
-  if(!state.reservations[key][state.currentDay][state.currentEmpl]) state.reservations[key][state.currentDay][state.currentEmpl]={};
-  if(!state.reservations[key][state.currentDay][state.currentEmpl][procPickerSlot]) state.reservations[key][state.currentDay][state.currentEmpl][procPickerSlot]=[];
-  const arr = state.reservations[key][state.currentDay][state.currentEmpl][procPickerSlot];
-  const idx = arr.indexOf(name);
-  if(idx >= 0) arr.splice(idx,1);
-  else {
-    if(arr.length >= MAX_PROCS_PAR_CRENEAU){
-      toast('Maximum '+MAX_PROCS_PAR_CRENEAU+' proclamateurs par créneau','warning');
-      return;
-    }
-    arr.push(name);
-  }
-  if(arr.length === 0) delete state.reservations[key][state.currentDay][state.currentEmpl][procPickerSlot];
-  if(Object.keys(state.reservations[key][state.currentDay][state.currentEmpl]).length === 0) delete state.reservations[key][state.currentDay][state.currentEmpl];
-  if(Object.keys(state.reservations[key][state.currentDay]||{}).length === 0) delete state.reservations[key][state.currentDay];
-  markDirty();
+function saveEditPlace(){
+  const lat = parseFloat($('ePLat').value);
+  const lng = parseFloat($('ePLng').value);
+  if(isNaN(lat) || isNaN(lng)){ toast('Coordonnées invalides','ko'); return; }
+  S.geo[S.editingPlaceName] = [lat, lng, $('ePNotes').value || ''];
   persistLocal();
-  renderProcGrid();
-  renderSlots();
-  renderDays();
-  updateDayStats();
-  updateDaySummary();
+  closeM('mEditPlace');
+  renderPlaces();
+  if(S.map) refreshMarkers();
+  toast('Emplacement mis à jour','ok');
 }
 
-function removeProc(h, name){
-  if(!state.authenticated){
-    toast('Connectez-vous en admin pour modifier', 'warning');
-    return;
+/* ============================================================
+   STATISTIQUES & HISTORIQUE
+   ============================================================ */
+function renderStats(){
+  const period = $('statsPeriod').value;
+  const refStr = $('statsRef').value || ymd(new Date().getFullYear(), new Date().getMonth(), new Date().getDate());
+  const ref = parseYmd(refStr);
+  let from, to;
+  if(period==='week'){
+    const dow = (ref.getDay()+6)%7; // lun=0
+    from = new Date(ref); from.setDate(ref.getDate()-dow);
+    to = new Date(from); to.setDate(from.getDate()+6);
+  } else if(period==='month'){
+    from = new Date(ref.getFullYear(), ref.getMonth(), 1);
+    to = new Date(ref.getFullYear(), ref.getMonth()+1, 0);
+  } else if(period==='year'){
+    from = new Date(ref.getFullYear(),0,1);
+    to = new Date(ref.getFullYear(),11,31);
+  } else {
+    from = new Date(2000,0,1); to = new Date(2099,11,31);
   }
-  const key = moisKey();
-  const arr = (((state.reservations[key]||{})[state.currentDay]||{})[state.currentEmpl]||{})[h];
-  if(!arr) return;
-  const idx = arr.indexOf(name);
-  if(idx>=0){
-    arr.splice(idx,1);
-    if(arr.length===0) delete state.reservations[key][state.currentDay][state.currentEmpl][h];
-    markDirty();
-    persistLocal();
-    renderSlots();
-    renderDays();
-    updateDayStats();
-    updateDaySummary();
-    toast(name+' retiré','success');
+  const fStr = ymd(from.getFullYear(), from.getMonth(), from.getDate());
+  const tStr = ymd(to.getFullYear(), to.getMonth(), to.getDate());
+
+  const all = S.reservations.filter(r => r.date>=fStr && r.date<=tStr && r.status!=='cancelled');
+  const totalH = (all.length*(CFG.mainMin||30))/60;
+
+  $('statsKPI').innerHTML = `
+    <div class="stat"><div class="num">${all.length}</div><div class="lbl">Réservations</div></div>
+    <div class="stat acc"><div class="num">${totalH.toFixed(1)} h</div><div class="lbl">Temps cumulé</div></div>
+    <div class="stat ok"><div class="num">${new Set(all.map(r=>r.proc)).size}</div><div class="lbl">Personnes actives</div></div>
+    <div class="stat"><div class="num">${new Set(all.map(r=>r.empl)).size}</div><div class="lbl">Emplacements utilisés</div></div>
+  `;
+
+  const cP = {}, cPe = {};
+  all.forEach(r => { cP[r.empl]=(cP[r.empl]||0)+1; cPe[r.proc]=(cPe[r.proc]||0)+1; });
+  const topP = Object.entries(cP).sort((a,b)=>b[1]-a[1]).slice(0,10);
+  const topPe = Object.entries(cPe).sort((a,b)=>b[1]-a[1]).slice(0,10);
+  $('statsTopPlaces').innerHTML = topP.length ? topP.map(([e,n],i)=>`<div class="row no-hover" style="cursor:default"><span>${i+1}. ${esc(e)}</span><span class="cnt">${n} · ${((n*(CFG.mainMin||30))/60).toFixed(1)}h</span></div>`).join('') : '<p class="empty">—</p>';
+  $('statsTopPeople').innerHTML = topPe.length ? topPe.map(([p,n],i)=>`<div class="row no-hover" style="cursor:default"><span>${i+1}. ${esc(display(p))} <span class="tag">${anonId(p)}</span></span><span class="cnt">${n} · ${((n*(CFG.mainMin||30))/60).toFixed(1)}h</span></div>`).join('') : '<p class="empty">—</p>';
+
+  renderHistory();
+}
+
+function renderHistory(){
+  const f1 = ($('histF1').value||'').toLowerCase();
+  const f2 = ($('histF2').value||'').toLowerCase();
+  const f3 = $('histF3').value;
+  let list = [...S.reservations];
+  if(f1) list = list.filter(r => r.empl.toLowerCase().includes(f1));
+  if(f2) list = list.filter(r => r.proc.toLowerCase().includes(f2));
+  if(f3) list = list.filter(r => r.status===f3);
+  list.sort((a,b)=> b.date.localeCompare(a.date) || b.heure.localeCompare(a.heure));
+  $('histCount').textContent = '('+list.length+')';
+  if(list.length===0){ $('histTable').innerHTML='<p class="empty">Aucun résultat.</p>'; return; }
+  const rows = list.slice(0,300).map(r=>`
+    <tr>
+      <td>${r.date}</td>
+      <td>${r.heure} → ${r.heureEnd||addMin(r.heure,CFG.mainMin)}</td>
+      <td>${esc(r.empl)}</td>
+      <td>${esc(display(r.proc))}<br><span class="tag">${anonId(r.proc)}</span></td>
+      <td><span class="tag ${r.status==='done'?'ok':r.status==='cancelled'?'ko':'wn'}">${r.status==='done'?'Effectué':r.status==='cancelled'?'Annulé':'Planifié'}</span></td>
+      <td>${esc(r.notes||'')}</td>
+    </tr>
+  `).join('');
+  $('histTable').innerHTML = `<table class="t"><thead><tr><th>Date</th><th>Horaire</th><th>Emplacement</th><th>Personne</th><th>Statut</th><th>Notes</th></tr></thead><tbody>${rows}</tbody></table>${list.length>300?'<p class="muted" style="margin-top:6px">Affichage limité à 300 lignes — exportez en CSV pour la liste complète.</p>':''}`;
+}
+
+/* ============================================================
+   RÉSERVATION RAPIDE (mode terrain)
+   ============================================================ */
+
+let QR = { empl: null, procs: [] };
+
+function initQuickReserve(){
+  const sel = $('qrEmpl');
+  sel.innerHTML = '<option value="">— Choisir un emplacement —</option>' +
+    EMPLACEMENTS.map(e => `<option value="${esa(e)}">${esc(e)}</option>`).join('');
+  sel.onchange = onQrEmplChange;
+}
+
+function onQrEmplChange(){
+  const e = $('qrEmpl').value;
+  QR.empl = e;
+  QR.procs = [];
+  $('btnQrLocate').disabled = !e;
+  if(!e){ $('qrProcsBox').style.display='none'; return; }
+  // Afficher la section proclamateurs
+  $('qrProcsBox').style.display='block';
+  renderQrProcs();
+}
+
+function renderQrProcs(){
+  const list = $('qrProcsList');
+  list.innerHTML = PROCLAMATEURS.map(p => `
+    <label style="display:block;padding:4px 6px;cursor:pointer;font-size:.85rem">
+      <input type="checkbox" value="${esa(p)}" onchange="toggleQrProc('${esa(p)}',this.checked)" style="margin-right:6px">
+      ${esc(display(p))} <span class="tag">${anonId(p)}</span>
+    </label>
+  `).join('');
+}
+
+function toggleQrProc(name, checked){
+  if(checked){
+    if(QR.procs.length >= MAX_PROCS){ toast('Maximum '+MAX_PROCS+' personnes','wn'); $('qrProcsList').querySelector(`input[value="${esa(name)}"]`).checked=false; return; }
+    QR.procs.push(name);
+  } else {
+    QR.procs = QR.procs.filter(p => p !== name);
   }
 }
 
-/* ========== RÉCAP JOUR ========== */
-function updateDaySummary(){
-  const el = document.getElementById('daySummary');
-  if(!state.currentDay){ el.innerHTML = '<p style="color:var(--text-muted);font-style:italic">Sélectionnez un jour pour voir le récapitulatif.</p>'; return; }
-  const key = moisKey();
-  const resDay = (state.reservations[key]||{})[state.currentDay]||{};
-  const entries = [];
-  Object.entries(resDay).forEach(([empl,slots])=>{
-    Object.entries(slots).forEach(([h,procs])=> entries.push({h,empl,procs}));
+function quickLocate(){
+  if(!QR.empl) return;
+  // Basculer sur l'onglet carte
+  goTab('map');
+  // Centrer la carte sur cet emplacement
+  setTimeout(()=>{
+    if(!S.map){ initMap(); setTimeout(centerOnEmpl, 200); }
+    else centerOnEmpl();
+  }, 100);
+  toast('🗺️ Carte centrée sur '+QR.empl,'ok');
+}
+
+function centerOnEmpl(){
+  const coords = (S.geo[QR.empl] || GEO_DEFAULT[QR.empl] || [48.8780,2.5953]).slice(0,2);
+  S.map.setView(coords, 17);
+  // Trouver le marqueur correspondant et ouvrir son popup
+  S.markers.forEach(m => {
+    const pos = m.getLatLng();
+    if(Math.abs(pos.lat-coords[0])<0.0001 && Math.abs(pos.lng-coords[1])<0.0001){
+      m.openPopup();
+    }
   });
-  entries.sort((a,b)=> a.h.localeCompare(b.h));
-  if(entries.length === 0){
-    el.innerHTML = '<p style="color:var(--text-muted);font-style:italic">Aucune réservation pour ce jour.</p>';
-    return;
-  }
-  const dt = new Date(state.currentYear, state.currentMonth, state.currentDay);
-  const jours = ['Dim.','Lun.','Mar.','Mer.','Jeu.','Ven.','Sam.'];
-  el.innerHTML = `<p style="font-weight:600;margin-bottom:6px">${jours[dt.getDay()]} ${state.currentDay}/${state.currentMonth+1} — ${entries.length} créneau${entries.length>1?'x':''}</p>` +
-    entries.map(e=>`<div style="padding:4px 0;border-bottom:1px dashed var(--border);font-size:.8rem">
-      <b>${e.h}</b> · ${escapeHtml(e.empl)}<br>
-      <span style="color:var(--text-muted);margin-left:8px">${e.procs.join(', ')}</span>
-    </div>`).join('');
 }
 
-/* ========== CHRONOMÈTRE ========== */
-function startChronoForSlot(h){
-  const key = moisKey();
-  const procs = (((state.reservations[key]||{})[state.currentDay]||{})[state.currentEmpl]||{})[h]||[];
-  startChronoExt(h, state.currentEmpl, procs.join(', '));
-}
-
-function startChronoExt(h, empl, procs){
-  chrono.ctxLabel = `${h} — ${empl}${procs?' · '+procs:''}`;
-  document.getElementById('chronoCtxVal').textContent = chrono.ctxLabel;
+function quickValidate(){
+  if(!QR.empl){ toast('Sélectionnez un emplacement','wn'); return; }
+  if(QR.procs.length===0){ toast('Sélectionnez au moins 1 proclamateur','wn'); return; }
+  if(QR.procs.length > MAX_PROCS){ toast('Maximum '+MAX_PROCS+' personnes','ko'); return; }
+  
+  // Créer la réservation pour aujourd'hui
+  const today = new Date();
+  const date = ymd(today.getFullYear(), today.getMonth(), today.getDate());
+  const now = new Date();
+  const heure = `${String(now.getHours()).padStart(2,'0')}:${String(Math.floor(now.getMinutes()/15)*15).padStart(2,'0')}`;
+  
+  let success = 0;
+  QR.procs.forEach(p => {
+    const r = addReservation({ date, empl:QR.empl, heure, proc:p, status:'planned', notes:'Création rapide terrain' });
+    if(r) success++;
+  });
+  
+  if(success === 0){ toast('Erreur : doublons détectés','ko'); return; }
+  
+  persistLocal();
+  toast(`✅ ${success} réservation${success>1?'s':''} créée${success>1?'s':''}. Chrono démarré !`,'ok');
+  
+  // Démarrer le chrono
+  chr.ctx = `${heure} · ${QR.empl} · ${QR.procs.map(display).join(', ')}`;
+  $('chronoCtx').textContent = chr.ctx;
   chronoReset();
-  chronoStart();
-  document.querySelector('.chrono-wrap').scrollIntoView({behavior:'smooth',block:'start'});
-  toast('⏱️ Chrono démarré : '+h+' — '+empl, 'success');
+  // Démarrer directement la phase 30 min (pas de préparation en mode rapide)
+  startPhase('main', CFG.mainMin*60*1000);
+  
+  // Réinitialiser le formulaire
+  QR.empl = null; QR.procs = [];
+  $('qrEmpl').value = '';
+  $('btnQrLocate').disabled = true;
+  $('qrProcsBox').style.display = 'none';
+  
+  // Basculer sur le dashboard pour voir le chrono
+  goTab('dashboard');
+  
+  // Rafraîchir l'affichage
+  renderAll();
 }
+
+
+/* ============================================================
+   CHRONOMÈTRE (3 min prep + 30 min décompte + bip 6 s)
+   ============================================================ */
+let chr = {
+  phase:'idle',      // 'idle' | 'prep' | 'main' | 'done'
+  remainingMs:0,
+  totalMs:0,
+  intervalId:null,
+  running:false,
+  audioCtx:null,
+  ctx:''
+};
 
 function chronoStart(){
-  if(chrono.running) return;
-  chrono.running = true;
-  const endAt = Date.now() + chrono.remainingMs;
-  chrono.intervalId = setInterval(()=>{
-    chrono.remainingMs = Math.max(0, endAt - Date.now());
-    updateChronoDisplay();
-    if(chrono.remainingMs === 0){
+  if(chr.phase==='idle' || chr.phase==='done'){
+    if((CFG.prepMin||0) > 0){
+      startPhase('prep', CFG.prepMin*60*1000);
+    } else {
+      startPhase('main', CFG.mainMin*60*1000);
+    }
+  } else {
+    resumeChrono();
+  }
+}
+
+function startPhase(phase, ms){
+  chr.phase = phase; chr.remainingMs = ms; chr.totalMs = ms;
+  updateChronoUI();
+  resumeChrono();
+}
+
+function resumeChrono(){
+  if(chr.running) return;
+  chr.running = true;
+  const endAt = Date.now() + chr.remainingMs;
+  chr.intervalId = setInterval(()=>{
+    chr.remainingMs = Math.max(0, endAt - Date.now());
+    updateChronoUI();
+    if(chr.remainingMs===0){
       chronoPause();
-      playEndBip();
-      document.getElementById('chronoLabel').textContent = '⏰ TEMPS ÉCOULÉ !';
-      toast('⏰ 25 min écoulées — changement d\'emplacement !', 'warning');
-      if('vibrate' in navigator) navigator.vibrate([300,150,300,150,300,150,300,150,300,150,300]);
+      if(chr.phase==='prep'){
+        playBeep(1200, 0.5);
+        toast('🟢 Préparation terminée — début des 30 min','ok');
+        setTimeout(()=>startPhase('main', CFG.mainMin*60*1000), 600);
+      } else if(chr.phase==='main'){
+        chr.phase='done';
+        playFinalBeep();
+        if('vibrate' in navigator) navigator.vibrate([400,200,400,200,400,200,400,200,400]);
+        toast('⏰ Temps écoulé — fin de créneau','wn');
+        updateChronoUI();
+      }
     }
   }, 200);
-  document.getElementById('btnChronoStart').disabled = true;
-  document.getElementById('btnChronoPause').disabled = false;
-  document.getElementById('chronoLabel').textContent = 'En cours…';
+  $('bChStart').disabled = true;
+  $('bChPause').disabled = false;
+  $('bChSkip').disabled = (chr.phase!=='prep');
 }
 
 function chronoPause(){
-  if(!chrono.running) return;
-  chrono.running = false;
-  clearInterval(chrono.intervalId);
-  document.getElementById('btnChronoStart').disabled = false;
-  document.getElementById('btnChronoPause').disabled = true;
-  document.getElementById('chronoLabel').textContent = 'En pause';
+  if(!chr.running) return;
+  chr.running=false; clearInterval(chr.intervalId);
+  $('bChStart').disabled = false; $('bChPause').disabled = true; $('bChSkip').disabled = true;
+}
+
+function chronoSkipToMain(){
+  if(chr.phase!=='prep') return;
+  chronoPause();
+  startPhase('main', CFG.mainMin*60*1000);
 }
 
 function chronoReset(){
   chronoPause();
-  chrono.remainingMs = settings.chronoMins * 60 * 1000;
-  updateChronoDisplay();
-  document.getElementById('chronoLabel').textContent = 'Prêt';
+  chr.phase='idle'; chr.remainingMs = (CFG.mainMin||30)*60*1000; chr.totalMs = chr.remainingMs;
+  chr.ctx = ''; $('chronoCtx').textContent='— Aucun créneau actif —';
+  updateChronoUI();
+  $('bChStart').disabled=false; $('bChPause').disabled=true; $('bChSkip').disabled=true;
 }
 
-function updateChronoDisplay(){
-  const total = Math.ceil(chrono.remainingMs/1000);
-  const m = Math.floor(total/60);
-  const s = total%60;
-  const disp = document.getElementById('chronoDisplay');
-  disp.textContent = `${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
-  disp.classList.toggle('warning', total <= 120 && total > 30);
-  disp.classList.toggle('critical', total <= 30 && total > 0);
+function updateChronoUI(){
+  const total = Math.ceil(chr.remainingMs/1000);
+  const m = Math.floor(total/60), s = total%60;
+  const d = $('chronoD'); d.textContent = `${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
+  d.classList.toggle('warn', total<=60 && total>20);
+  d.classList.toggle('crit', total<=20 && total>0);
+  const p = $('chronoPhase');
+  p.className = 'chrono-phase '+(chr.phase==='prep'?'prep':chr.phase==='main'?'run':chr.phase==='done'?'end':'');
+  p.textContent = chr.phase==='prep' ? 'Phase préparation' : chr.phase==='main' ? 'En cours · Présentoir' : chr.phase==='done' ? '⏰ Terminé' : 'Au repos';
+  const pct = chr.totalMs ? (chr.remainingMs/chr.totalMs)*100 : 100;
+  $('chronoBar').style.width = pct + '%';
 }
 
-function playEndBip(){
+function startChronoFor(h, empl, procs){
+  chr.ctx = `${h} · ${empl}${procs?' — '+procs:''}`;
+  $('chronoCtx').textContent = chr.ctx;
+  chronoReset();
+  // Démarrer directement la phase 30 min (pas de préparation en mode rapide)
+  startPhase('main', CFG.mainMin*60*1000);
+  goTab('dashboard');
+  toast('⏱️ Chrono lancé : '+h+' — '+empl,'ok');
+}
+
+function playBeep(freq, dur){
   try{
-    if(!chrono.audioCtx) chrono.audioCtx = new (window.AudioContext||window.webkitAudioContext)();
-    const ctx = chrono.audioCtx;
-    const now = ctx.currentTime;
-    // Bip continu de settings.bipSecs secondes, avec modulation pour être clair
-    const osc = ctx.createOscillator();
-    const gain = ctx.createGain();
-    osc.type = 'square';
-    osc.frequency.setValueAtTime(880, now);
-    gain.gain.setValueAtTime(0, now);
-    gain.gain.linearRampToValueAtTime(.25, now+0.02);
-    // Pulses : 6s avec pulsation à 4Hz pour plus audible
-    const dur = settings.bipSecs;
-    for(let t=0; t<dur; t+=0.25){
-      gain.gain.setValueAtTime(.25, now + t);
-      gain.gain.setValueAtTime(0,  now + t + 0.125);
-    }
-    gain.gain.linearRampToValueAtTime(0, now+dur);
-    osc.connect(gain).connect(ctx.destination);
-    osc.start(now);
-    osc.stop(now + dur + 0.05);
-  }catch(e){ console.warn('audio', e); }
+    if(!chr.audioCtx) chr.audioCtx = new (window.AudioContext||window.webkitAudioContext)();
+    const ctx = chr.audioCtx, now=ctx.currentTime;
+    const osc=ctx.createOscillator(), g=ctx.createGain();
+    osc.type='sine'; osc.frequency.setValueAtTime(freq, now);
+    g.gain.setValueAtTime(0, now); g.gain.linearRampToValueAtTime(.2, now+0.02); g.gain.linearRampToValueAtTime(0, now+dur);
+    osc.connect(g).connect(ctx.destination); osc.start(now); osc.stop(now+dur+.05);
+  }catch(e){}
 }
 
-/* ========== AUTH ========== */
+function playFinalBeep(){
+  try{
+    if(!chr.audioCtx) chr.audioCtx = new (window.AudioContext||window.webkitAudioContext)();
+    const ctx = chr.audioCtx, now=ctx.currentTime;
+    const dur = CFG.bipSec || 6;
+    const osc=ctx.createOscillator(), g=ctx.createGain();
+    osc.type='square'; osc.frequency.setValueAtTime(880, now);
+    g.gain.setValueAtTime(0, now); g.gain.linearRampToValueAtTime(.25, now+0.02);
+    for(let t=0; t<dur; t+=0.25){ g.gain.setValueAtTime(.25, now+t); g.gain.setValueAtTime(0, now+t+.125); }
+    g.gain.linearRampToValueAtTime(0, now+dur);
+    osc.connect(g).connect(ctx.destination); osc.start(now); osc.stop(now+dur+.05);
+  }catch(e){}
+}
+
+/* ============================================================
+   AUTHENTIFICATION (GAS)
+   ============================================================ */
 function promptAuth(){
-  if(state.authenticated){
-    // déconnexion
-    state.authenticated = false;
-    state.sessionToken = null;
-    state.authUser = null;
-    updateAuthUI();
-    toast('Déconnecté','success');
-    return;
+  if(S.auth){
+    S.auth=false; S.user=null; S.token=null;
+    updateAuthUI(); toast('Déconnecté','ok'); return;
   }
-  document.getElementById('authUser').value = '';
-  document.getElementById('authPass').value = '';
-  openModal('modalAuth');
+  $('aUser').value=''; $('aPass').value='';
+  openM('mAuth');
 }
 
 async function doAuth(){
-  const u = document.getElementById('authUser').value.trim();
-  const p = document.getElementById('authPass').value;
-  if(!u||!p){ toast('Identifiant et mot de passe requis','error'); return; }
-
-  // Si pas de GAS configuré → mode local simple (hash SHA-256 avec sel)
-  if(!settings.gasUrl){
-    const LOCAL_HASH = '41e3c3f8ab0e6d7e6cc70d4bf1f77a1c0b9ac3f4e0e5a34e0d5ce1e5b7e4f9aa'; // TODO: remplacer ou utiliser GAS
-    const salt = 'presentoir_chelles_2026';
-    const h = await sha256(p+salt);
-    if(h === LOCAL_HASH || (u === 'admin' && p === 'chelles2026')){
-      state.authenticated = true;
-      state.authUser = u;
-      state.sessionToken = 'local-'+Date.now();
-      updateAuthUI();
-      closeModal('modalAuth');
-      toast('Connecté (mode local)','success');
-    } else {
-      toast('Identifiants incorrects','error');
-    }
+  const u = $('aUser').value.trim(), p = $('aPass').value;
+  if(!u||!p){ toast('Identifiant & mot de passe requis','ko'); return; }
+  if(!CFG.gasUrl){
+    // Mode dégradé : auth locale simple
+    if(u==='admin' && p==='chelles2026'){
+      S.auth=true; S.user='admin (local)'; S.token='local-'+Date.now();
+      updateAuthUI(); closeM('mAuth'); toast('Connecté (mode local)','ok');
+    } else toast('Configurez d\'abord l\'URL GAS dans Administration','ko');
     return;
   }
-
-  // Mode GAS : appel serveur
   try{
-    toast('Connexion en cours...','');
-    const res = await gasCall({action:'verifyAdmin', user:u, password:p});
+    toast('Connexion en cours…');
+    const res = await gas({action:'verifyAdmin', user:u, password:p});
     if(res && res.ok && res.token){
-      state.authenticated = true;
-      state.authUser = u;
-      state.sessionToken = res.token;
-      updateAuthUI();
-      closeModal('modalAuth');
-      toast('Connecté : '+u,'success');
-    } else {
-      toast(res && res.error ? res.error : 'Identifiants incorrects','error');
-    }
-  }catch(e){
-    console.error(e);
-    toast('Erreur de connexion au serveur','error');
-  }
+      S.auth=true; S.user=u; S.token=res.token;
+      updateAuthUI(); closeM('mAuth'); toast('Connecté : '+u,'ok');
+    } else toast(res && res.error || 'Identifiants incorrects','ko');
+  }catch(e){ toast('Erreur : '+e.message,'ko'); }
 }
 
 function updateAuthUI(){
-  const dot = document.getElementById('authDot');
-  const lbl = document.getElementById('authLabel');
-  const btn = document.getElementById('btnAuth');
-  if(state.authenticated){
-    dot.classList.add('on');
-    lbl.textContent = '✅ Connecté : '+state.authUser;
-    btn.textContent = '🔓 Déconnexion';
+  const dot=$('authDot'), lbl=$('authLabel'), btn=$('btnAuth');
+  if(S.auth){
+    dot.classList.add('on'); lbl.textContent = S.user;
+    btn.textContent = '🔓';
   } else {
-    dot.classList.remove('on');
-    lbl.textContent = 'Mode lecture seule';
-    btn.textContent = '🔐 Se connecter';
+    dot.classList.remove('on'); lbl.textContent='Lecture';
+    btn.textContent = '🔐';
   }
 }
 
-async function sha256(s){
-  const buf = new TextEncoder().encode(s);
-  const hash = await crypto.subtle.digest('SHA-256', buf);
-  return Array.from(new Uint8Array(hash)).map(b=>b.toString(16).padStart(2,'0')).join('');
+async function gas(payload){
+  if(!CFG.gasUrl) throw new Error('URL GAS non configurée');
+  const r = await fetch(CFG.gasUrl, { method:'POST', headers:{'Content-Type':'text/plain;charset=UTF-8'}, body:JSON.stringify(payload) });
+  const t = await r.text();
+  try{ return JSON.parse(t); }catch(e){ throw new Error('Réponse invalide'); }
 }
 
-/* ========== GAS ========== */
-async function gasCall(payload){
-  if(!settings.gasUrl) throw new Error('URL GAS non configurée');
-  const resp = await fetch(settings.gasUrl, {
-    method:'POST',
-    headers:{'Content-Type':'text/plain;charset=UTF-8'},
-    body: JSON.stringify(payload)
-  });
-  const text = await resp.text();
-  try{ return JSON.parse(text); }catch(e){ throw new Error('Réponse GAS invalide : '+text.slice(0,200)); }
+async function testConnection(){
+  if(!CFG.gasUrl){ toast('URL GAS vide','wn'); return; }
+  try{
+    toast('Test en cours…');
+    const r = await fetch(CFG.gasUrl);
+    const t = await r.text();
+    const j = JSON.parse(t);
+    toast('✅ '+(j.service||'OK')+' v'+(j.version||'?'),'ok');
+  }catch(e){ toast('❌ Échec : '+e.message,'ko'); }
 }
 
 async function saveToDrive(){
-  if(!settings.gasUrl){
-    toast('Configurez l\'URL Apps Script dans ⚙️ Réglages pour sauver sur Drive','warning');
-    openModal('modalSettings');
-    return;
-  }
-  if(!state.authenticated){ toast('Connectez-vous en admin','warning'); return; }
+  if(!CFG.gasUrl){ toast('Configurez l\'URL GAS dans Administration','wn'); goTab('admin'); return; }
+  if(!S.auth){ toast('Connectez-vous en admin','wn'); openM('mAuth'); return; }
   try{
-    toast('💾 Sauvegarde sur Drive...','');
-    const res = await gasCall({
-      action:'saveData',
-      token: state.sessionToken,
-      folderId: settings.driveFolderId,
-      data: { reservations: state.reservations, savedAt: new Date().toISOString() }
-    });
-    if(res && res.ok) toast('✅ Sauvegardé sur Drive ('+res.file+')','success');
-    else toast(res && res.error ? res.error : 'Erreur sauvegarde','error');
-  }catch(e){
-    toast('Erreur : '+e.message,'error');
-  }
+    toast('💾 Sauvegarde Drive…');
+    const r = await gas({action:'saveData', token:S.token, folderId:CFG.folderId, data:{ reservations:S.reservations, geo:S.geo, savedAt:new Date().toISOString() }});
+    if(r && r.ok) toast('✅ Sauvegardé sur Drive ('+r.file+')','ok');
+    else toast(r && r.error || 'Erreur','ko');
+  }catch(e){ toast('Erreur : '+e.message,'ko'); }
 }
 
 async function loadFromDrive(){
-  if(!settings.gasUrl){ toast('URL GAS requise','warning'); return; }
+  if(!CFG.gasUrl){ toast('Configurez l\'URL GAS','wn'); return; }
   try{
-    toast('☁️ Chargement depuis Drive...','');
-    const res = await gasCall({action:'loadData', folderId: settings.driveFolderId});
-    if(res && res.ok && res.data && res.data.reservations){
-      state.reservations = res.data.reservations;
+    toast('☁️ Chargement Drive…');
+    const r = await gas({action:'loadData', folderId:CFG.folderId});
+    if(r && r.ok && r.data){
+      if(!confirm('Remplacer les données locales par celles du Drive ?')) return;
+      S.reservations = r.data.reservations || [];
+      S.geo = Object.assign({}, GEO_DEFAULT, r.data.geo||{});
       persistLocal();
-      renderDays();
-      renderEmplList();
-      updateDaySummary();
-      toast('✅ Données chargées depuis Drive','success');
-    } else {
-      toast('Aucune donnée trouvée sur Drive','warning');
-    }
-  }catch(e){ toast('Erreur : '+e.message,'error'); }
+      renderAll();
+      toast('✅ Drive rechargé','ok');
+    } else toast('Aucune donnée sur Drive','wn');
+  }catch(e){ toast('Erreur : '+e.message,'ko'); }
 }
 
-/* ========== EXPORTS ========== */
+/* ============================================================
+   IMPORT / EXPORT
+   ============================================================ */
 function exportWhatsApp(){
-  if(!state.currentDay){ toast('Sélectionnez un jour','warning'); return; }
-  const key = moisKey();
-  const resDay = (state.reservations[key]||{})[state.currentDay]||{};
-  const entries = [];
-  Object.entries(resDay).forEach(([empl,slots])=>{
-    Object.entries(slots).forEach(([h,procs])=> entries.push({h,empl,procs}));
-  });
-  entries.sort((a,b)=> a.h.localeCompare(b.h) || a.empl.localeCompare(b.empl));
-
-  const dt = new Date(state.currentYear, state.currentMonth, state.currentDay);
-  const joursLongs = ['dimanche','lundi','mardi','mercredi','jeudi','vendredi','samedi'];
-  let msg = `📍 *Présentoirs Chelles*\n🗓️ *${joursLongs[dt.getDay()]} ${state.currentDay} ${MOIS_NOMS[state.currentMonth]} ${state.currentYear}*\n\n`;
-  if(entries.length === 0){
-    msg += '_Aucune réservation pour ce jour._';
-  } else {
-    entries.forEach(e=>{
-      msg += `🕐 *${e.h}* — ${e.empl}\n   👥 ${e.procs.join(', ')}\n\n`;
-    });
-    msg += `_Total : ${entries.length} créneaux_`;
-  }
-  msg += '\n\n_Généré par BeluSoft-Tchapy_';
-
-  // Copie presse-papier + lien WA
+  if(!S.curDay){ toast('Sélectionnez d\'abord un jour','wn'); goTab('reservations'); return; }
+  const date = ymd(S.curYear, S.curMonth, S.curDay);
+  const list = S.reservations.filter(r => r.date===date && r.status!=='cancelled');
+  if(list.length===0){ toast('Aucune réservation ce jour','wn'); return; }
+  // grouper
+  const g = {};
+  list.forEach(r => { const k=r.heure+'|'+r.empl; if(!g[k]) g[k]={h:r.heure, e:r.empl, p:[]}; g[k].p.push(r.proc); });
+  const items = Object.values(g).sort((a,b)=>a.h.localeCompare(b.h) || a.e.localeCompare(b.e));
+  const dt = new Date(S.curYear, S.curMonth, S.curDay);
+  let msg = `📍 *Présentoirs Chelles*\n🗓️ *${JOURS_L[dt.getDay()].toLowerCase()} ${S.curDay} ${MOIS[S.curMonth]} ${S.curYear}*\n\n`;
+  items.forEach(i => { msg += `🕐 *${i.h}* · ${i.e}\n   👥 ${i.p.map(display).join(', ')}\n\n`; });
+  msg += `_Total : ${items.length} créneaux_\n_BeluSoft-Tchapy © 2026_`;
   navigator.clipboard.writeText(msg).then(()=>{
-    toast('💬 Message copié dans le presse-papier','success');
-    setTimeout(()=>{
-      window.open('https://wa.me/?text='+encodeURIComponent(msg), '_blank');
-    }, 400);
-  }).catch(()=>{
-    // fallback : ouvre direct
-    window.open('https://wa.me/?text='+encodeURIComponent(msg), '_blank');
-  });
+    toast('💬 Copié dans le presse-papier','ok');
+    setTimeout(()=> window.open('https://wa.me/?text='+encodeURIComponent(msg),'_blank'), 300);
+  }).catch(()=> window.open('https://wa.me/?text='+encodeURIComponent(msg),'_blank'));
+}
+
+function toCSV(rows){
+  return '\uFEFF' + rows.map(r => r.map(c => `"${String(c==null?'':c).replace(/"/g,'""')}"`).join(';')).join('\n');
 }
 
 function exportMonthCSV(){
-  const key = moisKey();
-  const resMois = state.reservations[key]||{};
-  const rows = [['Jour','Horaire','Emplacement','Proclamateur 1','Proclamateur 2','Proclamateur 3','Proclamateur 4']];
-  Object.keys(resMois).map(Number).sort((a,b)=>a-b).forEach(d=>{
-    Object.entries(resMois[d]).forEach(([empl,slots])=>{
-      Object.entries(slots).forEach(([h,procs])=>{
-        const row = [d,h,empl,...procs];
-        while(row.length<7) row.push('');
-        rows.push(row);
-      });
-    });
-  });
-  const csv = '\uFEFF' + rows.map(r=>r.map(c=>`"${String(c).replace(/"/g,'""')}"`).join(';')).join('\n');
-  const blob = new Blob([csv], {type:'text/csv;charset=utf-8'});
-  const a = document.createElement('a');
-  a.href = URL.createObjectURL(blob);
-  a.download = `presentoirs_chelles_${key}.csv`;
-  a.click();
-  toast('📊 CSV exporté','success');
+  const y=S.curYear, m=S.curMonth;
+  const from=ymd(y,m,1), to=ymd(y,m,31);
+  const list = S.reservations.filter(r => r.date>=from && r.date<=to).sort((a,b)=>a.date.localeCompare(b.date) || a.heure.localeCompare(b.heure));
+  doDownload(toCSV([['Date','Jour','Heure début','Heure fin','Emplacement','Personne','ID anonyme','Statut','Notes','GPS Lat','GPS Lng'],
+    ...list.map(r=>{
+      const dt=parseYmd(r.date); const g=S.geo[r.empl]||GEO_DEFAULT[r.empl]||[0,0];
+      return [r.date, JOURS_L[dt.getDay()], r.heure, r.heureEnd||addMin(r.heure,CFG.mainMin), r.empl, display(r.proc), anonId(r.proc), r.status, r.notes||'', g[0], g[1]];
+    })]), `presentoirs_chelles_${y}-${String(m+1).padStart(2,'0')}.csv`, 'text/csv');
+  toast('📊 CSV exporté','ok');
+}
+
+function exportAllCSV(){
+  const list = [...S.reservations].sort((a,b)=>a.date.localeCompare(b.date) || a.heure.localeCompare(b.heure));
+  doDownload(toCSV([['Date','Jour','Heure début','Heure fin','Emplacement','Personne','ID anonyme','Statut','Notes','GPS Lat','GPS Lng','Créé le','Créé par'],
+    ...list.map(r=>{ const dt=parseYmd(r.date); const g=S.geo[r.empl]||GEO_DEFAULT[r.empl]||[0,0];
+      return [r.date, JOURS_L[dt.getDay()], r.heure, r.heureEnd||addMin(r.heure,CFG.mainMin), r.empl, display(r.proc), anonId(r.proc), r.status, r.notes||'', g[0], g[1], r.createdAt||'', r.createdBy||''];
+    })]), `presentoirs_chelles_historique.csv`, 'text/csv');
+  toast('📊 Historique CSV exporté','ok');
+}
+
+function exportXLSX(){
+  // Format SpreadsheetML 2003 (.xml renommé .xls) — ouvrable par Excel sans dépendance
+  const list = [...S.reservations].sort((a,b)=>a.date.localeCompare(b.date) || a.heure.localeCompare(b.heure));
+  const head = ['Date','Jour','Heure début','Heure fin','Emplacement','Personne','ID anonyme','Statut','Notes'];
+  const cellsHead = head.map(h=>`<Cell><Data ss:Type="String">${esc(h)}</Data></Cell>`).join('');
+  const rows = list.map(r=>{
+    const dt=parseYmd(r.date);
+    const vals = [r.date, JOURS_L[dt.getDay()], r.heure, r.heureEnd||addMin(r.heure,CFG.mainMin), r.empl, display(r.proc), anonId(r.proc), r.status, r.notes||''];
+    return '<Row>' + vals.map(v=>`<Cell><Data ss:Type="String">${esc(v)}</Data></Cell>`).join('') + '</Row>';
+  }).join('');
+  const xml = `<?xml version="1.0"?>
+<?mso-application progid="Excel.Sheet"?>
+<Workbook xmlns="urn:schemas-microsoft-com:office:spreadsheet" xmlns:ss="urn:schemas-microsoft-com:office:spreadsheet">
+<Worksheet ss:Name="Presentoirs"><Table>
+<Row>${cellsHead}</Row>
+${rows}
+</Table></Worksheet></Workbook>`;
+  doDownload(xml, 'presentoirs_chelles.xls', 'application/vnd.ms-excel');
+  toast('📗 Excel exporté','ok');
 }
 
 function exportJSON(){
-  const blob = new Blob([JSON.stringify({reservations:state.reservations, exportedAt:new Date().toISOString()},null,2)], {type:'application/json'});
+  const data = { reservations:S.reservations, geo:S.geo, exportedAt:new Date().toISOString(), version:'V2' };
+  doDownload(JSON.stringify(data,null,2), `presentoirs_backup_${new Date().toISOString().slice(0,10)}.json`, 'application/json');
+  toast('💾 Backup téléchargé','ok');
+}
+
+function doDownload(content, name, type){
+  const blob = new Blob([content], {type:type+';charset=utf-8'});
   const a = document.createElement('a');
-  a.href = URL.createObjectURL(blob);
-  a.download = `presentoirs_chelles_backup_${new Date().toISOString().slice(0,10)}.json`;
-  a.click();
-  toast('💾 Backup local téléchargé','success');
+  a.href = URL.createObjectURL(blob); a.download = name; a.click();
+  setTimeout(()=>URL.revokeObjectURL(a.href), 1000);
 }
 
-function importJSON(evt){
-  const f = evt.target.files[0];
-  if(!f) return;
+function importJSON(e){
+  const f = e.target.files[0]; if(!f) return;
   const r = new FileReader();
-  r.onload = e => {
+  r.onload = ev => {
     try{
-      const d = JSON.parse(e.target.result);
-      if(!d.reservations){ toast('Fichier invalide','error'); return; }
-      if(!confirm('Remplacer toutes les réservations actuelles ?')) return;
-      state.reservations = d.reservations;
-      persistLocal();
-      renderDays(); renderEmplList(); updateDaySummary();
-      toast('✅ Import réussi','success');
-    }catch(err){ toast('Fichier JSON invalide','error'); }
+      const d = JSON.parse(ev.target.result);
+      if(!d.reservations){ toast('Fichier invalide','ko'); return; }
+      if(!confirm('Remplacer toutes les réservations par celles du fichier ?')) return;
+      S.reservations = d.reservations;
+      if(d.geo) S.geo = Object.assign({}, GEO_DEFAULT, d.geo);
+      persistLocal(); renderAll();
+      toast('✅ Import réussi ('+d.reservations.length+' résa)','ok');
+    }catch(e){ toast('JSON invalide','ko'); }
   };
-  r.readAsText(f);
-  evt.target.value = '';
+  r.readAsText(f); e.target.value='';
 }
 
-/* ========== HELPERS ========== */
-function openModal(id){ document.getElementById(id).classList.add('open'); }
-function closeModal(id){ document.getElementById(id).classList.remove('open'); }
-
-function toast(msg, type=''){
-  const t = document.getElementById('toast');
-  t.textContent = msg;
-  t.className = 'toast show '+type;
-  setTimeout(()=>t.classList.remove('show'), 3500);
+function mergeJSON(e){
+  const f = e.target.files[0]; if(!f) return;
+  const r = new FileReader();
+  r.onload = ev => {
+    try{
+      const d = JSON.parse(ev.target.result);
+      if(!d.reservations){ toast('Fichier invalide','ko'); return; }
+      let added=0, skipped=0;
+      d.reservations.forEach(nr => {
+        const dup = S.reservations.find(r2 => r2.date===nr.date && r2.empl===nr.empl && r2.heure===nr.heure && r2.proc===nr.proc);
+        if(dup){ skipped++; } else { S.reservations.push(nr); added++; }
+      });
+      persistLocal(); renderAll();
+      toast(`✅ Fusion : +${added} · ${skipped} doublons ignorés`,'ok');
+    }catch(e){ toast('JSON invalide','ko'); }
+  };
+  r.readAsText(f); e.target.value='';
 }
 
-function escapeHtml(s){ return String(s||'').replace(/[&<>"']/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
-function escapeAttr(s){ return String(s||'').replace(/\\/g,'\\\\').replace(/'/g,"\\'"); }
-
-document.addEventListener('click', e=>{
-  if(e.target.classList.contains('modal')) e.target.classList.remove('open');
-});
-
+/* Démarrer */
 window.addEventListener('DOMContentLoaded', init);
+document.addEventListener('click', e => { if(e.target.classList.contains('modal')) e.target.classList.remove('open'); });
 </script>
+
 </body>
 </html>
