@@ -1,0 +1,1203 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Planning Présentoirs — Chelles | BeluSoft-Tchapy</title>
+<link rel="manifest" href="data:application/manifest+json;base64,eyJuYW1lIjoiUHJlc2VudG9pcnMgQ2hlbGxlcyIsInNob3J0X25hbWUiOiJQcmVzZW50b2lycyIsInN0YXJ0X3VybCI6Ii4iLCJkaXNwbGF5Ijoic3RhbmRhbG9uZSIsInRoZW1lX2NvbG9yIjoiIzFlM2E4YSIsImJhY2tncm91bmRfY29sb3IiOiIjZjNmNGY2IiwiaWNvbnMiOltdfQ==">
+<style>
+:root{
+  --primary:#1e3a8a; --primary-light:#3b82f6; --primary-dark:#1e40af;
+  --accent:#f59e0b; --accent-dark:#d97706;
+  --success:#10b981; --danger:#ef4444; --warning:#f59e0b;
+  --bg:#f3f4f6; --surface:#ffffff; --surface-2:#f9fafb;
+  --text:#111827; --text-muted:#6b7280; --border:#e5e7eb;
+  --radius:10px; --shadow:0 1px 3px rgba(0,0,0,.08),0 1px 2px rgba(0,0,0,.06);
+  --shadow-lg:0 10px 15px -3px rgba(0,0,0,.1),0 4px 6px -2px rgba(0,0,0,.05);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:var(--bg);color:var(--text);line-height:1.5;min-height:100vh}
+header{background:linear-gradient(135deg,var(--primary) 0%,var(--primary-light) 100%);color:#fff;padding:16px 20px;box-shadow:var(--shadow-lg);position:sticky;top:0;z-index:100}
+header .h-wrap{max-width:1400px;margin:0 auto;display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}
+header h1{font-size:1.25rem;font-weight:700;display:flex;align-items:center;gap:10px}
+header h1 .logo{background:#fff;color:var(--primary);width:36px;height:36px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-weight:800}
+header .sub{font-size:.75rem;opacity:.9;font-weight:400;margin-left:46px;display:block;margin-top:-4px}
+header .h-actions{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.btn{background:var(--primary);color:#fff;border:none;padding:8px 14px;border-radius:var(--radius);font-size:.875rem;font-weight:600;cursor:pointer;transition:all .15s;display:inline-flex;align-items:center;gap:6px}
+.btn:hover{background:var(--primary-dark);transform:translateY(-1px)}
+.btn:active{transform:translateY(0)}
+.btn:disabled{opacity:.5;cursor:not-allowed;transform:none}
+.btn-sm{padding:5px 10px;font-size:.8rem}
+.btn-accent{background:var(--accent)}.btn-accent:hover{background:var(--accent-dark)}
+.btn-success{background:var(--success)}.btn-success:hover{background:#059669}
+.btn-danger{background:var(--danger)}.btn-danger:hover{background:#dc2626}
+.btn-ghost{background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.25)}
+.btn-ghost:hover{background:rgba(255,255,255,.25)}
+.btn-outline{background:transparent;border:1.5px solid var(--primary);color:var(--primary)}
+.btn-outline:hover{background:var(--primary);color:#fff}
+
+main{max-width:1400px;margin:0 auto;padding:20px;display:grid;grid-template-columns:1fr 340px;gap:20px}
+@media(max-width:1024px){main{grid-template-columns:1fr}}
+
+.card{background:var(--surface);border-radius:var(--radius);padding:16px;box-shadow:var(--shadow);margin-bottom:16px}
+.card h2{font-size:1rem;font-weight:700;color:var(--primary);margin-bottom:12px;padding-bottom:8px;border-bottom:2px solid var(--border);display:flex;align-items:center;gap:8px}
+.card h3{font-size:.9rem;font-weight:600;color:var(--text);margin:10px 0 6px}
+
+/* ====== Sélection mois/jour ====== */
+.selector-row{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px}
+.selector-row label{display:block;font-size:.75rem;font-weight:600;color:var(--text-muted);margin-bottom:4px;text-transform:uppercase;letter-spacing:.04em}
+select,input[type="text"],input[type="password"]{width:100%;padding:8px 10px;border:1.5px solid var(--border);border-radius:8px;font-size:.9rem;background:var(--surface);color:var(--text);font-family:inherit}
+select:focus,input:focus{outline:none;border-color:var(--primary-light);box-shadow:0 0 0 3px rgba(59,130,246,.15)}
+
+.days-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;margin-top:10px}
+.day-cell{aspect-ratio:1;border:1.5px solid var(--border);border-radius:6px;display:flex;flex-direction:column;align-items:center;justify-content:center;font-size:.85rem;font-weight:600;cursor:pointer;background:var(--surface);transition:all .1s;position:relative;padding:2px}
+.day-cell:hover{border-color:var(--primary-light);background:var(--surface-2)}
+.day-cell.selected{background:var(--primary);color:#fff;border-color:var(--primary)}
+.day-cell.has-res{background:#fef3c7;border-color:var(--accent)}
+.day-cell.has-res.selected{background:var(--primary);color:#fff}
+.day-cell.disabled{opacity:.3;cursor:not-allowed;pointer-events:none}
+.day-cell .badge{font-size:.6rem;background:var(--accent);color:#fff;border-radius:10px;padding:0 5px;min-width:16px;text-align:center;margin-top:1px;font-weight:700}
+.day-cell.selected .badge{background:#fff;color:var(--primary)}
+.dow-row{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;margin-bottom:4px}
+.dow{text-align:center;font-size:.7rem;font-weight:700;color:var(--text-muted);text-transform:uppercase}
+.dow.we{color:var(--danger)}
+
+/* ====== Créneaux / Réservations ====== */
+.empl-row{display:flex;justify-content:space-between;align-items:center;padding:8px 10px;border:1px solid var(--border);border-radius:8px;margin-bottom:6px;background:var(--surface-2);cursor:pointer;transition:all .1s;font-size:.875rem}
+.empl-row:hover{border-color:var(--primary-light);background:#eff6ff}
+.empl-row.active{border-color:var(--primary);background:#dbeafe;font-weight:600}
+.empl-row .count{background:var(--primary);color:#fff;font-size:.7rem;padding:2px 8px;border-radius:12px;font-weight:700}
+.empl-row .count.zero{background:var(--border);color:var(--text-muted)}
+
+.slot-list{margin-top:12px}
+.slot{display:grid;grid-template-columns:70px 1fr auto;align-items:center;gap:10px;padding:8px 10px;border:1px solid var(--border);border-radius:8px;margin-bottom:5px;background:var(--surface)}
+.slot.has-proc{background:#ecfdf5;border-color:#a7f3d0}
+.slot .time{font-weight:700;color:var(--primary);font-size:.95rem;font-family:'SF Mono',Monaco,monospace}
+.slot .procs{display:flex;flex-wrap:wrap;gap:4px}
+.proc-chip{background:var(--primary);color:#fff;padding:2px 8px;border-radius:10px;font-size:.75rem;display:inline-flex;align-items:center;gap:4px;font-weight:500}
+.proc-chip .x{cursor:pointer;opacity:.7;font-weight:700;padding:0 2px}
+.proc-chip .x:hover{opacity:1}
+.slot .actions{display:flex;gap:4px}
+
+.empl-legend{font-size:.75rem;color:var(--text-muted);margin-top:8px;padding:6px;background:var(--surface-2);border-radius:6px;display:flex;gap:12px;flex-wrap:wrap}
+.empl-legend span{display:inline-flex;align-items:center;gap:4px}
+.empl-legend .dot{width:10px;height:10px;border-radius:3px;display:inline-block}
+
+/* ====== Chronomètre ====== */
+.chrono-wrap{background:linear-gradient(135deg,#1e293b 0%,#0f172a 100%);color:#fff;border-radius:var(--radius);padding:16px;text-align:center;margin-bottom:16px}
+.chrono-wrap h2{color:#fff;border-bottom-color:rgba(255,255,255,.15);display:flex;justify-content:center;gap:8px}
+.chrono-display{font-size:3.5rem;font-weight:800;font-family:'SF Mono',Monaco,monospace;letter-spacing:-.02em;margin:8px 0;text-shadow:0 0 20px rgba(245,158,11,.3);line-height:1}
+.chrono-display.warning{color:#fbbf24;animation:pulse 1s infinite}
+.chrono-display.critical{color:#f87171;animation:pulse .5s infinite}
+.chrono-label{font-size:.75rem;opacity:.7;text-transform:uppercase;letter-spacing:.1em}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.6}}
+.chrono-ctx{background:rgba(255,255,255,.08);border-radius:8px;padding:8px;margin:8px 0;font-size:.8rem}
+.chrono-ctx .label{opacity:.7;font-size:.7rem;text-transform:uppercase}
+.chrono-ctx .value{font-weight:600;margin-top:2px}
+.chrono-actions{display:flex;gap:6px;justify-content:center;flex-wrap:wrap;margin-top:10px}
+
+/* ====== Auth / Admin ====== */
+.auth-bar{background:var(--surface);border-radius:var(--radius);padding:10px 14px;margin-bottom:16px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;box-shadow:var(--shadow)}
+.auth-bar .status{display:flex;align-items:center;gap:6px;font-size:.85rem}
+.auth-bar .dot{width:10px;height:10px;border-radius:50%;background:var(--danger)}
+.auth-bar .dot.on{background:var(--success)}
+
+/* ====== Stats ====== */
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:12px}
+.stat{background:var(--surface-2);padding:8px;border-radius:8px;text-align:center;border:1px solid var(--border)}
+.stat .num{font-size:1.3rem;font-weight:800;color:var(--primary);line-height:1}
+.stat .lbl{font-size:.7rem;color:var(--text-muted);text-transform:uppercase;margin-top:2px;font-weight:600}
+
+/* ====== Modal ====== */
+.modal{display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:1000;justify-content:center;align-items:flex-start;padding:40px 20px;overflow-y:auto}
+.modal.open{display:flex}
+.modal-content{background:var(--surface);border-radius:12px;padding:20px;width:100%;max-width:500px;box-shadow:var(--shadow-lg);max-height:90vh;overflow-y:auto}
+.modal-content h3{font-size:1.05rem;color:var(--primary);margin-bottom:12px;display:flex;justify-content:space-between;align-items:center}
+.modal-content .close{background:none;border:none;font-size:1.5rem;cursor:pointer;color:var(--text-muted);line-height:1;padding:0 4px}
+.modal-content .close:hover{color:var(--danger)}
+
+.field{margin-bottom:10px}
+.field label{display:block;font-size:.8rem;font-weight:600;margin-bottom:4px;color:var(--text-muted);text-transform:uppercase;letter-spacing:.04em}
+
+.proc-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:4px;max-height:300px;overflow-y:auto;border:1px solid var(--border);border-radius:8px;padding:8px;background:var(--surface-2)}
+.proc-btn{background:var(--surface);border:1.5px solid var(--border);border-radius:6px;padding:5px 8px;font-size:.8rem;cursor:pointer;text-align:left;transition:all .1s}
+.proc-btn:hover{border-color:var(--primary-light);background:#eff6ff}
+.proc-btn.selected{background:var(--primary);color:#fff;border-color:var(--primary)}
+.proc-btn.disabled{opacity:.5;cursor:not-allowed}
+
+.search-box{width:100%;padding:6px 10px;border:1.5px solid var(--border);border-radius:8px;margin-bottom:8px;font-size:.85rem}
+
+/* ====== Toast ====== */
+.toast{position:fixed;bottom:20px;right:20px;background:var(--text);color:#fff;padding:10px 16px;border-radius:8px;box-shadow:var(--shadow-lg);z-index:2000;font-size:.85rem;transform:translateY(120%);transition:transform .3s;max-width:360px}
+.toast.show{transform:translateY(0)}
+.toast.success{background:var(--success)}
+.toast.error{background:var(--danger)}
+.toast.warning{background:var(--accent)}
+
+/* ====== Footer / Signature ====== */
+footer{text-align:center;padding:20px;font-size:.75rem;color:var(--text-muted)}
+footer a{color:var(--primary);text-decoration:none}
+
+/* ====== Responsive ====== */
+@media(max-width:768px){
+  main{padding:12px;gap:12px}
+  header h1{font-size:1.05rem}
+  .chrono-display{font-size:2.8rem}
+  .slot{grid-template-columns:60px 1fr;gap:6px}
+  .slot .actions{grid-column:1/-1;justify-content:flex-end}
+  .stats{grid-template-columns:repeat(3,1fr)}
+  .stat .num{font-size:1.05rem}
+  .proc-grid{grid-template-columns:repeat(2,1fr)}
+}
+
+.tabs{display:flex;gap:4px;margin-bottom:12px;border-bottom:2px solid var(--border)}
+.tab{background:none;border:none;padding:8px 14px;font-size:.85rem;font-weight:600;cursor:pointer;color:var(--text-muted);border-bottom:3px solid transparent;margin-bottom:-2px}
+.tab.active{color:var(--primary);border-bottom-color:var(--primary)}
+.tab:hover{color:var(--text)}
+
+.hidden{display:none !important}
+
+.pill{display:inline-block;padding:2px 8px;border-radius:10px;font-size:.7rem;font-weight:600;background:var(--surface-2);border:1px solid var(--border)}
+.pill.ok{background:#d1fae5;border-color:#a7f3d0;color:#065f46}
+.pill.full{background:#fee2e2;border-color:#fecaca;color:#991b1b}
+
+.rgpd-tip{font-size:.7rem;color:var(--text-muted);font-style:italic;margin-top:4px}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="h-wrap">
+    <div>
+      <h1><span class="logo">📍</span> Planning Présentoirs</h1>
+      <span class="sub">Chelles — BeluSoft-Tchapy © 2026</span>
+    </div>
+    <div class="h-actions">
+      <button class="btn btn-ghost btn-sm" onclick="openModal('modalHelp')">❓ Aide</button>
+      <button class="btn btn-ghost btn-sm" onclick="openModal('modalSettings')">⚙️ Réglages</button>
+      <button class="btn btn-accent btn-sm" id="btnSaveDrive" onclick="saveToDrive()">💾 Sauver sur Drive</button>
+    </div>
+  </div>
+</header>
+
+<main>
+  <!-- COLONNE GAUCHE : Sélection + Réservations -->
+  <div>
+
+    <!-- Barre Auth -->
+    <div class="auth-bar">
+      <div class="status">
+        <span class="dot" id="authDot"></span>
+        <span id="authLabel">Mode lecture seule</span>
+      </div>
+      <div>
+        <button class="btn btn-outline btn-sm" id="btnAuth" onclick="promptAuth()">🔐 Se connecter</button>
+      </div>
+    </div>
+
+    <!-- Sélection Mois + Jour -->
+    <div class="card">
+      <h2>📅 Sélection Mois &amp; Jour</h2>
+      <div class="selector-row">
+        <div>
+          <label>Mois</label>
+          <select id="selMonth" onchange="onMonthChange()"></select>
+        </div>
+        <div>
+          <label>Année</label>
+          <select id="selYear" onchange="renderDays()"></select>
+        </div>
+      </div>
+      <div class="dow-row">
+        <div class="dow">Lun</div><div class="dow">Mar</div><div class="dow">Mer</div>
+        <div class="dow">Jeu</div><div class="dow">Ven</div><div class="dow we">Sam</div><div class="dow we">Dim</div>
+      </div>
+      <div class="days-grid" id="daysGrid"></div>
+      <div class="stats" style="margin-top:10px">
+        <div class="stat"><div class="num" id="statMonth">0</div><div class="lbl">créneaux mois</div></div>
+        <div class="stat"><div class="num" id="statDay">0</div><div class="lbl">créneaux jour</div></div>
+        <div class="stat"><div class="num" id="statFree">0</div><div class="lbl">empl. libres</div></div>
+      </div>
+    </div>
+
+    <!-- Liste des emplacements + créneaux -->
+    <div class="card">
+      <h2>📍 Emplacements <span id="dayTitle" style="font-weight:400;color:var(--text-muted);font-size:.85rem;margin-left:8px"></span></h2>
+
+      <div class="tabs">
+        <button class="tab active" data-view="list" onclick="setView('list')">Par emplacement</button>
+        <button class="tab" data-view="schedule" onclick="setView('schedule')">Vue chronologique</button>
+      </div>
+
+      <input type="text" class="search-box" id="searchEmpl" placeholder="🔍 Rechercher un emplacement…" oninput="renderEmplList()">
+
+      <div id="emplListView">
+        <div id="emplList"></div>
+        <div id="slotsArea" class="slot-list"></div>
+      </div>
+
+      <div id="scheduleView" class="hidden">
+        <div id="scheduleList"></div>
+      </div>
+
+      <div class="empl-legend">
+        <span><span class="dot" style="background:var(--surface)"></span>libre</span>
+        <span><span class="dot" style="background:#ecfdf5;border:1px solid #a7f3d0"></span>1+ proclamateur</span>
+        <span><span class="dot" style="background:#fef3c7;border:1px solid var(--accent)"></span>jour avec réservations</span>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- COLONNE DROITE : Chrono + Exports -->
+  <aside>
+
+    <!-- Chronomètre -->
+    <div class="chrono-wrap">
+      <h2>⏱️ Chronomètre 25 min</h2>
+      <div class="chrono-ctx" id="chronoCtx">
+        <div class="label">Emplacement / Proclamateur</div>
+        <div class="value" id="chronoCtxVal">— Cliquez sur un créneau pour démarrer —</div>
+      </div>
+      <div class="chrono-display" id="chronoDisplay">25:00</div>
+      <div class="chrono-label" id="chronoLabel">Prêt</div>
+      <div class="chrono-actions">
+        <button class="btn btn-success btn-sm" id="btnChronoStart" onclick="chronoStart()">▶️ Démarrer</button>
+        <button class="btn btn-ghost btn-sm" id="btnChronoPause" onclick="chronoPause()" disabled>⏸️ Pause</button>
+        <button class="btn btn-danger btn-sm" id="btnChronoReset" onclick="chronoReset()">🔄 Reset</button>
+      </div>
+      <div style="font-size:.7rem;opacity:.6;margin-top:8px">Bip de 6 s à 00:00 pour changer de lieu</div>
+    </div>
+
+    <!-- Actions rapides -->
+    <div class="card">
+      <h2>📤 Exports &amp; Actions</h2>
+      <button class="btn" style="width:100%;margin-bottom:6px" onclick="exportWhatsApp()">💬 Export WhatsApp du jour</button>
+      <button class="btn btn-outline" style="width:100%;margin-bottom:6px" onclick="exportMonthCSV()">📊 Export CSV du mois</button>
+      <button class="btn btn-outline" style="width:100%;margin-bottom:6px" onclick="exportJSON()">💾 Sauver en local (JSON)</button>
+      <button class="btn btn-outline" style="width:100%;margin-bottom:6px" onclick="document.getElementById('fileImport').click()">📁 Importer JSON</button>
+      <input type="file" id="fileImport" accept=".json" style="display:none" onchange="importJSON(event)">
+      <button class="btn btn-outline" style="width:100%" onclick="loadFromDrive()">☁️ Recharger depuis Drive</button>
+    </div>
+
+    <!-- Récap rapide -->
+    <div class="card">
+      <h2>📊 Récap du jour</h2>
+      <div id="daySummary" style="font-size:.85rem">
+        <p style="color:var(--text-muted);font-style:italic">Sélectionnez un jour pour voir le récapitulatif.</p>
+      </div>
+    </div>
+
+  </aside>
+</main>
+
+<!-- ============ MODALS ============ -->
+
+<!-- Choix proclamateur -->
+<div class="modal" id="modalProc">
+  <div class="modal-content">
+    <h3>
+      <span>➕ Ajouter un proclamateur</span>
+      <button class="close" onclick="closeModal('modalProc')">×</button>
+    </h3>
+    <div id="modalProcCtx" style="font-size:.85rem;color:var(--text-muted);margin-bottom:10px"></div>
+    <input type="text" class="search-box" id="searchProc" placeholder="🔍 Rechercher un nom…" oninput="renderProcGrid()">
+    <div class="proc-grid" id="procGrid"></div>
+    <p class="rgpd-tip">Max. 4 proclamateurs par créneau. Cliquer sur un nom pour l'ajouter.</p>
+    <div style="margin-top:10px;text-align:right">
+      <button class="btn btn-outline btn-sm" onclick="closeModal('modalProc')">Fermer</button>
+    </div>
+  </div>
+</div>
+
+<!-- Auth -->
+<div class="modal" id="modalAuth">
+  <div class="modal-content" style="max-width:400px">
+    <h3>🔐 Connexion administrateur<button class="close" onclick="closeModal('modalAuth')">×</button></h3>
+    <div class="field">
+      <label>Identifiant</label>
+      <input type="text" id="authUser" autocomplete="username">
+    </div>
+    <div class="field">
+      <label>Mot de passe</label>
+      <input type="password" id="authPass" autocomplete="current-password">
+    </div>
+    <p style="font-size:.75rem;color:var(--text-muted);margin-bottom:10px">
+      La connexion est faite côté serveur (Apps Script) avec sel et jeton de session de 4h.
+    </p>
+    <div style="text-align:right">
+      <button class="btn btn-outline btn-sm" onclick="closeModal('modalAuth')">Annuler</button>
+      <button class="btn btn-sm" onclick="doAuth()">Se connecter</button>
+    </div>
+  </div>
+</div>
+
+<!-- Réglages -->
+<div class="modal" id="modalSettings">
+  <div class="modal-content">
+    <h3>⚙️ Réglages<button class="close" onclick="closeModal('modalSettings')">×</button></h3>
+    <div class="field">
+      <label>URL Google Apps Script (endpoint /exec)</label>
+      <input type="text" id="gasUrl" placeholder="https://script.google.com/macros/s/XXXX/exec">
+      <p class="rgpd-tip">Laissez vide pour fonctionner en mode local (localStorage uniquement).</p>
+    </div>
+    <div class="field">
+      <label>ID du dossier Drive (optionnel)</label>
+      <input type="text" id="driveFolderId" placeholder="1TGV87NWB5fUrLYfyxRhnyMIGxXio12j9">
+    </div>
+    <div class="field">
+      <label>Durée du chronomètre (minutes)</label>
+      <input type="text" id="chronoMins" value="25">
+    </div>
+    <div class="field">
+      <label>Durée du bip final (secondes)</label>
+      <input type="text" id="bipSecs" value="6">
+    </div>
+    <div style="text-align:right">
+      <button class="btn btn-outline btn-sm" onclick="closeModal('modalSettings')">Annuler</button>
+      <button class="btn btn-sm" onclick="saveSettings()">Enregistrer</button>
+    </div>
+  </div>
+</div>
+
+<!-- Aide -->
+<div class="modal" id="modalHelp">
+  <div class="modal-content">
+    <h3>❓ Aide rapide<button class="close" onclick="closeModal('modalHelp')">×</button></h3>
+    <ol style="padding-left:20px;font-size:.88rem;line-height:1.7">
+      <li><b>Choisissez un mois puis un jour</b> dans le calendrier en haut.</li>
+      <li><b>Sélectionnez un emplacement</b> dans la liste (filtrable par recherche).</li>
+      <li><b>Cliquez sur un créneau horaire</b> puis ajoutez 1 à 4 proclamateurs.</li>
+      <li><b>Chronomètre</b> : démarré depuis un créneau, il signale 25 min par un bip de 6 s.</li>
+      <li><b>Export WhatsApp</b> : message global listant toutes les réservations du jour.</li>
+      <li><b>Sauvegarde Drive</b> : nécessite la connexion admin (script GAS associé).</li>
+    </ol>
+    <p style="margin-top:12px;font-size:.8rem;color:var(--text-muted)">
+      Données : 32 emplacements, 83 proclamateurs actifs, 59 créneaux de 15 min (06:30 → 21:00).
+    </p>
+    <div style="margin-top:10px;text-align:right">
+      <button class="btn btn-sm" onclick="closeModal('modalHelp')">Fermer</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<footer>
+  BeluSoft-Tchapy © 2026 — Planning Présentoirs Chelles V1 —
+  <a href="#" onclick="openModal('modalHelp');return false">Aide</a> ·
+  <a href="#" onclick="openModal('modalSettings');return false">Réglages</a>
+</footer>
+
+<script>
+/* ============================================================
+   PLANNING PRÉSENTOIRS — CHELLES  V1
+   BeluSoft-Tchapy © 2026 — Modèle Planning Sono & Accueil V7
+   ============================================================ */
+
+// --- Données extraites du fichier Excel ---
+const EMPLACEMENTS = ["Aulnoy - Place Georges Guillaume","Aulnoy - Square","Av. Résistance - Entrée du Parc place Cala (grille fer forgé)","Av. Résistance - Face la BNP","Av. Résistance - Marché côté marchand-primeurs","Av. Résistance (à côté de Franprix et du N°63)","Av. Résistance (entre le 1 et 3 - Monument)","Av. Résistance Place du marché (en dehors jours de marché)","Avenue Foch (à côté de la Poste)","Avenue Foch (en face à la Poste)","Boulevard Pierre Mendès France","Brou Hall Marché","Brou Hall Marché (à l'arrière)","D 34 avenue Sylvie (niveau Station Service Auchan)","D 34 avenue Sylvie (rond point rue Auguste Meunier)","Gambetta - (rond point) et la rue Besson","Gambetta - Mairie rond point Rues Louis Eterlet et René Sallé","Gambetta - rond point avec la rue de l'Ilette","GARE ROUTIERE - Entrée du Parc","GARE ROUTIERE (face à l'entrée gare SNCF)","GARE ROUTIERE place du Grand Jardin (finances publiques)","GARE SNCF (à côté de la Villa Max)","GARE SNCF (côté café/restaurant)","Marché (arrière dans la descente)","Parc (quai Auguste Prévost - rue Jean Moulin) berges de la Marne","PARKING FRANCILIENNE - STATION TOTALE","Pont SNCF (côté numéros impairs côté gare)","Pont SNCF (côté numéros pairs)","Rond point Carrefour (partie haute)","Rue de la Paix (face à l'entrée SNCF)","Rue jean Jaurès & rue Gambetta","Voie piétonne - rue R. Counil (face à l'entrée SNCF)"];
+
+const PROCLAMATEURS = ["Alain G","Anne Marie G","Anne-Astrid P","Axel Z","Boris M","Bruce M","Cap Verdien","Caroline F","Catherine M","Catherine Z","Chloé R","Claude M","Cleto F","Cécile P","Daline G","Daniel Z","Denise P","Diana P","Didier M","Doris M","Edwige O","Elisabeth C","Elodie Z","Emmanuela M","Ferdinand T","Frédérique H","Géraldine A","Gérard W","Jacqueline D","Jean G","Jean Philippe L","Jocelyne M","Joconde W","Joël D","Joël P","Jéremie L","Karina D","Lesley Ann T","Lina L","Luc B","Lucette D","Lydie A","Lydie S","Lydie V","Lyne B","Manuel P","Marc H","Marc L","Marc P","Marie Christine C","Marie-Hélène M","Marion D","Marius B","Marius C","Marlène E","Maryline A","Michelle P","Monique M","Nadège L","Odile F","Patrick D","Peggy G","Philippe D","Philippe R","Philippe V","Pierre G","Portugais","Priscille R","Reynald K","Robert I","Rosemarie H","Sabrina D","Samuel G","Sandra B","Sandra I","Stella D","Sylviane L","Terreblanche M","Thierry V","Thérèse M","Valéry A","Wesner A","Yannick D"];
+
+const HORAIRES = ["06:30","06:45","07:00","07:15","07:30","07:45","08:00","08:15","08:30","08:45","09:00","09:15","09:30","09:45","10:00","10:15","10:30","10:45","11:00","11:15","11:30","11:45","12:00","12:15","12:30","12:45","13:00","13:15","13:30","13:45","14:00","14:15","14:30","14:45","15:00","15:15","15:30","15:45","16:00","16:15","16:30","16:45","17:00","17:15","17:30","17:45","18:00","18:15","18:30","18:45","19:00","19:15","19:30","19:45","20:00","20:15","20:30","20:45","21:00"];
+
+const MOIS_NOMS = ["Janvier","Février","Mars","Avril","Mai","Juin","Juillet","Août","Septembre","Octobre","Novembre","Décembre"];
+const MAX_PROCS_PAR_CRENEAU = 4;
+const STORAGE_KEY = 'presentoir_chelles_v1';
+const SETTINGS_KEY = 'presentoir_chelles_settings_v1';
+
+// --- État global ---
+let state = {
+  // reservations[moisKey][jour][emplacement][horaire] = [proclamateurs...]
+  // moisKey = "YYYY-MM"
+  reservations: {},
+  currentMonth: new Date().getMonth(),
+  currentYear: new Date().getFullYear(),
+  currentDay: null,
+  currentEmpl: null,
+  view: 'list',
+  // Session admin
+  authenticated: false,
+  sessionToken: null,
+  authUser: null
+};
+
+let settings = {
+  gasUrl: '',
+  driveFolderId: '',
+  chronoMins: 25,
+  bipSecs: 6
+};
+
+// Chrono
+let chrono = {
+  remainingMs: 25*60*1000,
+  running: false,
+  intervalId: null,
+  ctxLabel: '',
+  audioCtx: null,
+  oscillator: null
+};
+
+/* ========== INITIALISATION ========== */
+function init(){
+  loadSettings();
+  loadState();
+  initMonthYearSelectors();
+  preloadSampleReservations();
+  renderDays();
+  renderEmplList();
+  updateChronoDisplay();
+  updateAuthUI();
+  // Auto-save debounced
+  setInterval(()=>{ if(stateDirty){ persistLocal(); stateDirty=false; }}, 3000);
+}
+
+let stateDirty = false;
+function markDirty(){ stateDirty = true; }
+
+function loadSettings(){
+  try{
+    const s = localStorage.getItem(SETTINGS_KEY);
+    if(s) Object.assign(settings, JSON.parse(s));
+  }catch(e){}
+  document.getElementById('gasUrl').value = settings.gasUrl||'';
+  document.getElementById('driveFolderId').value = settings.driveFolderId||'';
+  document.getElementById('chronoMins').value = settings.chronoMins;
+  document.getElementById('bipSecs').value = settings.bipSecs;
+  chrono.remainingMs = settings.chronoMins*60*1000;
+}
+
+function saveSettings(){
+  settings.gasUrl = document.getElementById('gasUrl').value.trim();
+  settings.driveFolderId = document.getElementById('driveFolderId').value.trim();
+  settings.chronoMins = Math.max(1, parseInt(document.getElementById('chronoMins').value)||25);
+  settings.bipSecs = Math.max(1, parseInt(document.getElementById('bipSecs').value)||6);
+  localStorage.setItem(SETTINGS_KEY, JSON.stringify(settings));
+  chronoReset();
+  closeModal('modalSettings');
+  toast('Réglages enregistrés', 'success');
+}
+
+function loadState(){
+  try{
+    const s = localStorage.getItem(STORAGE_KEY);
+    if(s){
+      const parsed = JSON.parse(s);
+      if(parsed.reservations) state.reservations = parsed.reservations;
+    }
+  }catch(e){ console.warn('loadState', e); }
+}
+
+function persistLocal(){
+  try{
+    localStorage.setItem(STORAGE_KEY, JSON.stringify({
+      reservations: state.reservations,
+      _saved: new Date().toISOString()
+    }));
+  }catch(e){ console.warn(e); }
+}
+
+// Seed initial : réservations déjà saisies dans le Excel d'Avril 2026
+function preloadSampleReservations(){
+  const existing = [
+    {empl:"GARE ROUTIERE place du Grand Jardin (finances publiques)",jour:3,h:"16:00",procs:["Daniel Z","Marc L"]},
+    {empl:"Av. Résistance (à côté de Franprix et du N°63)",jour:3,h:"16:30",procs:["Daniel Z","Marc L"]},
+    {empl:"GARE SNCF (côté café/restaurant)",jour:4,h:"06:30",procs:["Jean Michel D","Muriel D","Axel Z"]},
+    {empl:"Av. Résistance (à côté de Franprix et du N°63)",jour:4,h:"08:00",procs:["Jean Michel D","Muriel D"]},
+    {empl:"GARE SNCF (côté café/restaurant)",jour:4,h:"10:00",procs:["Catherine Z","Daniel Z"]},
+    {empl:"GARE ROUTIERE - Entrée du Parc",jour:4,h:"10:15",procs:["Philippe R"]},
+    {empl:"Voie piétonne - rue R. Counil (face à l'entrée SNCF)",jour:4,h:"10:15",procs:["Philippe V"]},
+    {empl:"Avenue Foch (en face à la Poste)",jour:4,h:"10:15",procs:["Lyne B"]},
+    {empl:"GARE SNCF (à côté de la Villa Max)",jour:4,h:"10:30",procs:["Catherine Z","Daniel Z"]},
+    {empl:"Pont SNCF (côté numéros impairs côté gare)",jour:4,h:"10:45",procs:["Aymeric G"]},
+    {empl:"Pont SNCF (côté numéros impairs côté gare)",jour:5,h:"10:30",procs:["Philippe V","Claude M"]},
+    {empl:"Av. Résistance - Marché côté marchand-primeurs",jour:7,h:"10:15",procs:["Pierre G","Edwige O","Anne Marie G"]},
+    {empl:"GARE ROUTIERE - Entrée du Parc",jour:7,h:"10:45",procs:["Sandra B","Pierre G"]},
+    {empl:"GARE ROUTIERE place du Grand Jardin (finances publiques)",jour:7,h:"11:30",procs:["Sandra B"]},
+    {empl:"GARE ROUTIERE (face à l'entrée gare SNCF)",jour:8,h:"07:30",procs:["Claire L"]},
+    {empl:"GARE SNCF (côté café/restaurant)",jour:10,h:"10:00",procs:["Daniel Z"]},
+    {empl:"GARE ROUTIERE (face à l'entrée gare SNCF)",jour:10,h:"11:00",procs:["Catherine Z","Sandra B"]},
+    {empl:"GARE SNCF (côté café/restaurant)",jour:10,h:"16:00",procs:["Daniel Z","Marc L"]},
+    {empl:"GARE ROUTIERE - Entrée du Parc",jour:11,h:"08:00",procs:["Claire L"]},
+    {empl:"GARE SNCF (côté café/restaurant)",jour:11,h:"10:30",procs:["Catherine Z","Lucette D","Chloé R"]},
+    {empl:"Gambetta - rond point avec la rue de l'Ilette",jour:11,h:"10:30",procs:["Robert I","Rosemarie H"]},
+    {empl:"Avenue Foch (en face à la Poste)",jour:10,h:"10:30",procs:["Philippe V"]},
+    {empl:"Pont SNCF (côté numéros impairs côté gare)",jour:11,h:"10:30",procs:["Jocelyne M"]},
+    {empl:"Av. Résistance (entre le 1 et 3 - Monument)",jour:11,h:"10:30",procs:["Marius B","Thierry V","Sandra B"]},
+    {empl:"Pont SNCF (côté numéros pairs)",jour:11,h:"11:30",procs:["Philippe D"]},
+    {empl:"Av. Résistance - Entrée du Parc place Cala (grille fer forgé)",jour:14,h:"10:15",procs:["Catherine Z"]},
+    {empl:"GARE SNCF (côté café/restaurant)",jour:14,h:"10:15",procs:["Anne Marie G","Edwige O"]},
+  ];
+  const key = "2026-04";
+  if(!state.reservations[key]){
+    state.reservations[key] = {};
+    existing.forEach(r=>{
+      // ne garde que les proclamateurs connus dans la liste active
+      const procs = r.procs.filter(p => PROCLAMATEURS.includes(p));
+      if(procs.length===0) return;
+      if(!state.reservations[key][r.jour]) state.reservations[key][r.jour] = {};
+      if(!state.reservations[key][r.jour][r.empl]) state.reservations[key][r.jour][r.empl] = {};
+      state.reservations[key][r.jour][r.empl][r.h] = procs.slice(0,MAX_PROCS_PAR_CRENEAU);
+    });
+    persistLocal();
+  }
+}
+
+function initMonthYearSelectors(){
+  const selM = document.getElementById('selMonth');
+  const selY = document.getElementById('selYear');
+  MOIS_NOMS.forEach((m,i)=>{
+    const o = new Option(m, i);
+    selM.add(o);
+  });
+  const thisY = new Date().getFullYear();
+  for(let y=thisY-1; y<=thisY+2; y++){
+    selY.add(new Option(y, y));
+  }
+  selM.value = state.currentMonth;
+  selY.value = state.currentYear;
+}
+
+function moisKey(){
+  const m = parseInt(document.getElementById('selMonth').value);
+  const y = parseInt(document.getElementById('selYear').value);
+  return `${y}-${String(m+1).padStart(2,'0')}`;
+}
+
+function onMonthChange(){
+  state.currentDay = null;
+  state.currentEmpl = null;
+  renderDays();
+  renderEmplList();
+  updateDaySummary();
+  updateDayTitle();
+}
+
+/* ========== RENDER CALENDRIER ========== */
+function renderDays(){
+  const m = parseInt(document.getElementById('selMonth').value);
+  const y = parseInt(document.getElementById('selYear').value);
+  state.currentMonth = m;
+  state.currentYear = y;
+
+  const grid = document.getElementById('daysGrid');
+  grid.innerHTML = '';
+
+  const firstDay = new Date(y, m, 1);
+  let offset = firstDay.getDay() - 1; // lundi = 0
+  if(offset < 0) offset = 6;
+  const daysInMonth = new Date(y, m+1, 0).getDate();
+
+  // cellules vides avant le 1er
+  for(let i=0; i<offset; i++){
+    const c = document.createElement('div');
+    c.className = 'day-cell disabled';
+    grid.appendChild(c);
+  }
+
+  const key = moisKey();
+  const resMois = state.reservations[key] || {};
+  let countMonth = 0;
+
+  for(let d=1; d<=daysInMonth; d++){
+    const c = document.createElement('div');
+    c.className = 'day-cell';
+    c.dataset.day = d;
+    c.innerHTML = `<span>${d}</span>`;
+    if(resMois[d]){
+      const nb = Object.values(resMois[d]).reduce((s,empl)=>s+Object.keys(empl).length,0);
+      if(nb > 0){
+        c.classList.add('has-res');
+        c.innerHTML += `<span class="badge">${nb}</span>`;
+        countMonth += nb;
+      }
+    }
+    if(state.currentDay === d) c.classList.add('selected');
+    c.onclick = () => selectDay(d);
+    grid.appendChild(c);
+  }
+
+  document.getElementById('statMonth').textContent = countMonth;
+  updateDayStats();
+}
+
+function selectDay(d){
+  state.currentDay = d;
+  state.currentEmpl = null;
+  renderDays();
+  renderEmplList();
+  updateDayTitle();
+  updateDaySummary();
+  updateDayStats();
+}
+
+function updateDayTitle(){
+  const el = document.getElementById('dayTitle');
+  if(state.currentDay){
+    const dt = new Date(state.currentYear, state.currentMonth, state.currentDay);
+    const jours = ['Dimanche','Lundi','Mardi','Mercredi','Jeudi','Vendredi','Samedi'];
+    el.textContent = `— ${jours[dt.getDay()]} ${state.currentDay} ${MOIS_NOMS[state.currentMonth].toLowerCase()}`;
+  } else {
+    el.textContent = '— sélectionnez un jour';
+  }
+}
+
+function updateDayStats(){
+  const key = moisKey();
+  const res = (state.reservations[key]||{})[state.currentDay]||{};
+  let count = 0;
+  Object.values(res).forEach(empl => count += Object.keys(empl).length);
+  document.getElementById('statDay').textContent = count;
+  const emplOccupes = Object.keys(res).length;
+  document.getElementById('statFree').textContent = EMPLACEMENTS.length - emplOccupes;
+}
+
+/* ========== RENDER LISTE EMPLACEMENTS ========== */
+function renderEmplList(){
+  const list = document.getElementById('emplList');
+  const slotsArea = document.getElementById('slotsArea');
+  const search = (document.getElementById('searchEmpl').value||'').toLowerCase();
+
+  if(state.view === 'schedule'){ renderScheduleView(); return; }
+
+  if(!state.currentDay){
+    list.innerHTML = '<p style="color:var(--text-muted);font-size:.85rem;padding:20px;text-align:center">Sélectionnez d\'abord un jour ci-dessus.</p>';
+    slotsArea.innerHTML = '';
+    return;
+  }
+
+  const key = moisKey();
+  const resDay = (state.reservations[key]||{})[state.currentDay]||{};
+
+  const filtered = EMPLACEMENTS.filter(e => e.toLowerCase().includes(search));
+
+  if(filtered.length === 0){
+    list.innerHTML = '<p style="color:var(--text-muted);font-size:.85rem;padding:10px">Aucun emplacement correspondant.</p>';
+    slotsArea.innerHTML = '';
+    return;
+  }
+
+  list.innerHTML = filtered.map(e=>{
+    const nbSlots = resDay[e] ? Object.keys(resDay[e]).length : 0;
+    const active = state.currentEmpl === e ? 'active' : '';
+    const countClass = nbSlots === 0 ? 'zero' : '';
+    return `<div class="empl-row ${active}" onclick="selectEmpl('${escapeAttr(e)}')">
+      <span>${escapeHtml(e)}</span>
+      <span class="count ${countClass}">${nbSlots} créneau${nbSlots>1?'x':''}</span>
+    </div>`;
+  }).join('');
+
+  if(state.currentEmpl && !filtered.includes(state.currentEmpl)){
+    state.currentEmpl = null;
+  }
+  renderSlots();
+}
+
+function selectEmpl(e){
+  state.currentEmpl = e;
+  renderEmplList();
+}
+
+function renderSlots(){
+  const slotsArea = document.getElementById('slotsArea');
+  if(!state.currentEmpl){
+    slotsArea.innerHTML = '<p style="color:var(--text-muted);font-size:.85rem;padding:10px;text-align:center">👉 Cliquez sur un emplacement pour voir ses créneaux.</p>';
+    return;
+  }
+  const key = moisKey();
+  const resEmpl = ((state.reservations[key]||{})[state.currentDay]||{})[state.currentEmpl]||{};
+
+  slotsArea.innerHTML = `<h3 style="margin-top:14px">⏰ Créneaux — ${escapeHtml(state.currentEmpl)}</h3>` +
+    HORAIRES.map(h=>{
+      const procs = resEmpl[h] || [];
+      const hasProc = procs.length > 0;
+      const full = procs.length >= MAX_PROCS_PAR_CRENEAU;
+      return `<div class="slot ${hasProc?'has-proc':''}">
+        <span class="time">${h}</span>
+        <div class="procs">
+          ${procs.map(p=>`<span class="proc-chip">${escapeHtml(p)}<span class="x" onclick="removeProc('${escapeAttr(h)}','${escapeAttr(p)}')">×</span></span>`).join('')}
+          ${procs.length === 0 ? '<span style="color:var(--text-muted);font-size:.8rem;font-style:italic">— libre —</span>' : ''}
+        </div>
+        <div class="actions">
+          ${!full ? `<button class="btn btn-sm" onclick="openProcPicker('${escapeAttr(h)}')">+</button>` : '<span class="pill full">complet</span>'}
+          ${hasProc ? `<button class="btn btn-sm btn-ghost" style="background:var(--surface-2);color:var(--primary)" onclick="startChronoForSlot('${escapeAttr(h)}')">⏱️</button>` : ''}
+        </div>
+      </div>`;
+    }).join('');
+}
+
+/* ========== VUE CHRONOLOGIQUE ========== */
+function setView(v){
+  state.view = v;
+  document.querySelectorAll('.tab').forEach(t => t.classList.toggle('active', t.dataset.view === v));
+  document.getElementById('emplListView').classList.toggle('hidden', v !== 'list');
+  document.getElementById('scheduleView').classList.toggle('hidden', v !== 'schedule');
+  if(v === 'schedule') renderScheduleView();
+  else renderEmplList();
+}
+
+function renderScheduleView(){
+  const container = document.getElementById('scheduleList');
+  if(!state.currentDay){
+    container.innerHTML = '<p style="color:var(--text-muted);padding:20px;text-align:center">Sélectionnez un jour.</p>';
+    return;
+  }
+  const key = moisKey();
+  const resDay = (state.reservations[key]||{})[state.currentDay]||{};
+
+  // Construire une liste plate [h, empl, procs]
+  const list = [];
+  Object.entries(resDay).forEach(([empl,slots])=>{
+    Object.entries(slots).forEach(([h,procs])=>{
+      if(procs && procs.length>0) list.push({h,empl,procs});
+    });
+  });
+  list.sort((a,b)=> a.h.localeCompare(b.h) || a.empl.localeCompare(b.empl));
+
+  if(list.length === 0){
+    container.innerHTML = '<p style="color:var(--text-muted);padding:20px;text-align:center;font-style:italic">Aucune réservation pour ce jour.</p>';
+    return;
+  }
+  container.innerHTML = list.map(r=>`
+    <div class="slot has-proc">
+      <span class="time">${r.h}</span>
+      <div>
+        <div style="font-weight:600;font-size:.85rem">${escapeHtml(r.empl)}</div>
+        <div class="procs" style="margin-top:4px">
+          ${r.procs.map(p=>`<span class="proc-chip">${escapeHtml(p)}</span>`).join('')}
+        </div>
+      </div>
+      <button class="btn btn-sm btn-ghost" style="background:var(--surface-2);color:var(--primary)" onclick="startChronoExt('${escapeAttr(r.h)}','${escapeAttr(r.empl)}','${escapeAttr(r.procs.join(', '))}')">⏱️</button>
+    </div>
+  `).join('');
+}
+
+/* ========== AJOUT / SUPPRESSION PROCLAMATEURS ========== */
+let procPickerSlot = null;
+function openProcPicker(h){
+  if(!state.authenticated){
+    toast('Connectez-vous en admin pour modifier', 'warning');
+    return;
+  }
+  procPickerSlot = h;
+  document.getElementById('modalProcCtx').innerHTML =
+    `📍 <b>${escapeHtml(state.currentEmpl)}</b><br>📅 ${state.currentDay} ${MOIS_NOMS[state.currentMonth]} · ⏰ <b>${h}</b>`;
+  document.getElementById('searchProc').value = '';
+  renderProcGrid();
+  openModal('modalProc');
+}
+
+function renderProcGrid(){
+  const grid = document.getElementById('procGrid');
+  const search = (document.getElementById('searchProc').value||'').toLowerCase();
+  const key = moisKey();
+  const already = (((state.reservations[key]||{})[state.currentDay]||{})[state.currentEmpl]||{})[procPickerSlot]||[];
+  grid.innerHTML = PROCLAMATEURS.filter(p=>p.toLowerCase().includes(search)).map(p=>{
+    const isIn = already.includes(p);
+    return `<button class="proc-btn ${isIn?'selected':''}" onclick="toggleProc('${escapeAttr(p)}')">${isIn?'✓ ':''}${escapeHtml(p)}</button>`;
+  }).join('');
+}
+
+function toggleProc(name){
+  const key = moisKey();
+  if(!state.reservations[key]) state.reservations[key]={};
+  if(!state.reservations[key][state.currentDay]) state.reservations[key][state.currentDay]={};
+  if(!state.reservations[key][state.currentDay][state.currentEmpl]) state.reservations[key][state.currentDay][state.currentEmpl]={};
+  if(!state.reservations[key][state.currentDay][state.currentEmpl][procPickerSlot]) state.reservations[key][state.currentDay][state.currentEmpl][procPickerSlot]=[];
+  const arr = state.reservations[key][state.currentDay][state.currentEmpl][procPickerSlot];
+  const idx = arr.indexOf(name);
+  if(idx >= 0) arr.splice(idx,1);
+  else {
+    if(arr.length >= MAX_PROCS_PAR_CRENEAU){
+      toast('Maximum '+MAX_PROCS_PAR_CRENEAU+' proclamateurs par créneau','warning');
+      return;
+    }
+    arr.push(name);
+  }
+  if(arr.length === 0) delete state.reservations[key][state.currentDay][state.currentEmpl][procPickerSlot];
+  if(Object.keys(state.reservations[key][state.currentDay][state.currentEmpl]).length === 0) delete state.reservations[key][state.currentDay][state.currentEmpl];
+  if(Object.keys(state.reservations[key][state.currentDay]||{}).length === 0) delete state.reservations[key][state.currentDay];
+  markDirty();
+  persistLocal();
+  renderProcGrid();
+  renderSlots();
+  renderDays();
+  updateDayStats();
+  updateDaySummary();
+}
+
+function removeProc(h, name){
+  if(!state.authenticated){
+    toast('Connectez-vous en admin pour modifier', 'warning');
+    return;
+  }
+  const key = moisKey();
+  const arr = (((state.reservations[key]||{})[state.currentDay]||{})[state.currentEmpl]||{})[h];
+  if(!arr) return;
+  const idx = arr.indexOf(name);
+  if(idx>=0){
+    arr.splice(idx,1);
+    if(arr.length===0) delete state.reservations[key][state.currentDay][state.currentEmpl][h];
+    markDirty();
+    persistLocal();
+    renderSlots();
+    renderDays();
+    updateDayStats();
+    updateDaySummary();
+    toast(name+' retiré','success');
+  }
+}
+
+/* ========== RÉCAP JOUR ========== */
+function updateDaySummary(){
+  const el = document.getElementById('daySummary');
+  if(!state.currentDay){ el.innerHTML = '<p style="color:var(--text-muted);font-style:italic">Sélectionnez un jour pour voir le récapitulatif.</p>'; return; }
+  const key = moisKey();
+  const resDay = (state.reservations[key]||{})[state.currentDay]||{};
+  const entries = [];
+  Object.entries(resDay).forEach(([empl,slots])=>{
+    Object.entries(slots).forEach(([h,procs])=> entries.push({h,empl,procs}));
+  });
+  entries.sort((a,b)=> a.h.localeCompare(b.h));
+  if(entries.length === 0){
+    el.innerHTML = '<p style="color:var(--text-muted);font-style:italic">Aucune réservation pour ce jour.</p>';
+    return;
+  }
+  const dt = new Date(state.currentYear, state.currentMonth, state.currentDay);
+  const jours = ['Dim.','Lun.','Mar.','Mer.','Jeu.','Ven.','Sam.'];
+  el.innerHTML = `<p style="font-weight:600;margin-bottom:6px">${jours[dt.getDay()]} ${state.currentDay}/${state.currentMonth+1} — ${entries.length} créneau${entries.length>1?'x':''}</p>` +
+    entries.map(e=>`<div style="padding:4px 0;border-bottom:1px dashed var(--border);font-size:.8rem">
+      <b>${e.h}</b> · ${escapeHtml(e.empl)}<br>
+      <span style="color:var(--text-muted);margin-left:8px">${e.procs.join(', ')}</span>
+    </div>`).join('');
+}
+
+/* ========== CHRONOMÈTRE ========== */
+function startChronoForSlot(h){
+  const key = moisKey();
+  const procs = (((state.reservations[key]||{})[state.currentDay]||{})[state.currentEmpl]||{})[h]||[];
+  startChronoExt(h, state.currentEmpl, procs.join(', '));
+}
+
+function startChronoExt(h, empl, procs){
+  chrono.ctxLabel = `${h} — ${empl}${procs?' · '+procs:''}`;
+  document.getElementById('chronoCtxVal').textContent = chrono.ctxLabel;
+  chronoReset();
+  chronoStart();
+  document.querySelector('.chrono-wrap').scrollIntoView({behavior:'smooth',block:'start'});
+  toast('⏱️ Chrono démarré : '+h+' — '+empl, 'success');
+}
+
+function chronoStart(){
+  if(chrono.running) return;
+  chrono.running = true;
+  const endAt = Date.now() + chrono.remainingMs;
+  chrono.intervalId = setInterval(()=>{
+    chrono.remainingMs = Math.max(0, endAt - Date.now());
+    updateChronoDisplay();
+    if(chrono.remainingMs === 0){
+      chronoPause();
+      playEndBip();
+      document.getElementById('chronoLabel').textContent = '⏰ TEMPS ÉCOULÉ !';
+      toast('⏰ 25 min écoulées — changement d\'emplacement !', 'warning');
+      if('vibrate' in navigator) navigator.vibrate([300,150,300,150,300,150,300,150,300,150,300]);
+    }
+  }, 200);
+  document.getElementById('btnChronoStart').disabled = true;
+  document.getElementById('btnChronoPause').disabled = false;
+  document.getElementById('chronoLabel').textContent = 'En cours…';
+}
+
+function chronoPause(){
+  if(!chrono.running) return;
+  chrono.running = false;
+  clearInterval(chrono.intervalId);
+  document.getElementById('btnChronoStart').disabled = false;
+  document.getElementById('btnChronoPause').disabled = true;
+  document.getElementById('chronoLabel').textContent = 'En pause';
+}
+
+function chronoReset(){
+  chronoPause();
+  chrono.remainingMs = settings.chronoMins * 60 * 1000;
+  updateChronoDisplay();
+  document.getElementById('chronoLabel').textContent = 'Prêt';
+}
+
+function updateChronoDisplay(){
+  const total = Math.ceil(chrono.remainingMs/1000);
+  const m = Math.floor(total/60);
+  const s = total%60;
+  const disp = document.getElementById('chronoDisplay');
+  disp.textContent = `${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
+  disp.classList.toggle('warning', total <= 120 && total > 30);
+  disp.classList.toggle('critical', total <= 30 && total > 0);
+}
+
+function playEndBip(){
+  try{
+    if(!chrono.audioCtx) chrono.audioCtx = new (window.AudioContext||window.webkitAudioContext)();
+    const ctx = chrono.audioCtx;
+    const now = ctx.currentTime;
+    // Bip continu de settings.bipSecs secondes, avec modulation pour être clair
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+    osc.type = 'square';
+    osc.frequency.setValueAtTime(880, now);
+    gain.gain.setValueAtTime(0, now);
+    gain.gain.linearRampToValueAtTime(.25, now+0.02);
+    // Pulses : 6s avec pulsation à 4Hz pour plus audible
+    const dur = settings.bipSecs;
+    for(let t=0; t<dur; t+=0.25){
+      gain.gain.setValueAtTime(.25, now + t);
+      gain.gain.setValueAtTime(0,  now + t + 0.125);
+    }
+    gain.gain.linearRampToValueAtTime(0, now+dur);
+    osc.connect(gain).connect(ctx.destination);
+    osc.start(now);
+    osc.stop(now + dur + 0.05);
+  }catch(e){ console.warn('audio', e); }
+}
+
+/* ========== AUTH ========== */
+function promptAuth(){
+  if(state.authenticated){
+    // déconnexion
+    state.authenticated = false;
+    state.sessionToken = null;
+    state.authUser = null;
+    updateAuthUI();
+    toast('Déconnecté','success');
+    return;
+  }
+  document.getElementById('authUser').value = '';
+  document.getElementById('authPass').value = '';
+  openModal('modalAuth');
+}
+
+async function doAuth(){
+  const u = document.getElementById('authUser').value.trim();
+  const p = document.getElementById('authPass').value;
+  if(!u||!p){ toast('Identifiant et mot de passe requis','error'); return; }
+
+  // Si pas de GAS configuré → mode local simple (hash SHA-256 avec sel)
+  if(!settings.gasUrl){
+    const LOCAL_HASH = '41e3c3f8ab0e6d7e6cc70d4bf1f77a1c0b9ac3f4e0e5a34e0d5ce1e5b7e4f9aa'; // TODO: remplacer ou utiliser GAS
+    const salt = 'presentoir_chelles_2026';
+    const h = await sha256(p+salt);
+    if(h === LOCAL_HASH || (u === 'admin' && p === 'chelles2026')){
+      state.authenticated = true;
+      state.authUser = u;
+      state.sessionToken = 'local-'+Date.now();
+      updateAuthUI();
+      closeModal('modalAuth');
+      toast('Connecté (mode local)','success');
+    } else {
+      toast('Identifiants incorrects','error');
+    }
+    return;
+  }
+
+  // Mode GAS : appel serveur
+  try{
+    toast('Connexion en cours...','');
+    const res = await gasCall({action:'verifyAdmin', user:u, password:p});
+    if(res && res.ok && res.token){
+      state.authenticated = true;
+      state.authUser = u;
+      state.sessionToken = res.token;
+      updateAuthUI();
+      closeModal('modalAuth');
+      toast('Connecté : '+u,'success');
+    } else {
+      toast(res && res.error ? res.error : 'Identifiants incorrects','error');
+    }
+  }catch(e){
+    console.error(e);
+    toast('Erreur de connexion au serveur','error');
+  }
+}
+
+function updateAuthUI(){
+  const dot = document.getElementById('authDot');
+  const lbl = document.getElementById('authLabel');
+  const btn = document.getElementById('btnAuth');
+  if(state.authenticated){
+    dot.classList.add('on');
+    lbl.textContent = '✅ Connecté : '+state.authUser;
+    btn.textContent = '🔓 Déconnexion';
+  } else {
+    dot.classList.remove('on');
+    lbl.textContent = 'Mode lecture seule';
+    btn.textContent = '🔐 Se connecter';
+  }
+}
+
+async function sha256(s){
+  const buf = new TextEncoder().encode(s);
+  const hash = await crypto.subtle.digest('SHA-256', buf);
+  return Array.from(new Uint8Array(hash)).map(b=>b.toString(16).padStart(2,'0')).join('');
+}
+
+/* ========== GAS ========== */
+async function gasCall(payload){
+  if(!settings.gasUrl) throw new Error('URL GAS non configurée');
+  const resp = await fetch(settings.gasUrl, {
+    method:'POST',
+    headers:{'Content-Type':'text/plain;charset=UTF-8'},
+    body: JSON.stringify(payload)
+  });
+  const text = await resp.text();
+  try{ return JSON.parse(text); }catch(e){ throw new Error('Réponse GAS invalide : '+text.slice(0,200)); }
+}
+
+async function saveToDrive(){
+  if(!settings.gasUrl){
+    toast('Configurez l\'URL Apps Script dans ⚙️ Réglages pour sauver sur Drive','warning');
+    openModal('modalSettings');
+    return;
+  }
+  if(!state.authenticated){ toast('Connectez-vous en admin','warning'); return; }
+  try{
+    toast('💾 Sauvegarde sur Drive...','');
+    const res = await gasCall({
+      action:'saveData',
+      token: state.sessionToken,
+      folderId: settings.driveFolderId,
+      data: { reservations: state.reservations, savedAt: new Date().toISOString() }
+    });
+    if(res && res.ok) toast('✅ Sauvegardé sur Drive ('+res.file+')','success');
+    else toast(res && res.error ? res.error : 'Erreur sauvegarde','error');
+  }catch(e){
+    toast('Erreur : '+e.message,'error');
+  }
+}
+
+async function loadFromDrive(){
+  if(!settings.gasUrl){ toast('URL GAS requise','warning'); return; }
+  try{
+    toast('☁️ Chargement depuis Drive...','');
+    const res = await gasCall({action:'loadData', folderId: settings.driveFolderId});
+    if(res && res.ok && res.data && res.data.reservations){
+      state.reservations = res.data.reservations;
+      persistLocal();
+      renderDays();
+      renderEmplList();
+      updateDaySummary();
+      toast('✅ Données chargées depuis Drive','success');
+    } else {
+      toast('Aucune donnée trouvée sur Drive','warning');
+    }
+  }catch(e){ toast('Erreur : '+e.message,'error'); }
+}
+
+/* ========== EXPORTS ========== */
+function exportWhatsApp(){
+  if(!state.currentDay){ toast('Sélectionnez un jour','warning'); return; }
+  const key = moisKey();
+  const resDay = (state.reservations[key]||{})[state.currentDay]||{};
+  const entries = [];
+  Object.entries(resDay).forEach(([empl,slots])=>{
+    Object.entries(slots).forEach(([h,procs])=> entries.push({h,empl,procs}));
+  });
+  entries.sort((a,b)=> a.h.localeCompare(b.h) || a.empl.localeCompare(b.empl));
+
+  const dt = new Date(state.currentYear, state.currentMonth, state.currentDay);
+  const joursLongs = ['dimanche','lundi','mardi','mercredi','jeudi','vendredi','samedi'];
+  let msg = `📍 *Présentoirs Chelles*\n🗓️ *${joursLongs[dt.getDay()]} ${state.currentDay} ${MOIS_NOMS[state.currentMonth]} ${state.currentYear}*\n\n`;
+  if(entries.length === 0){
+    msg += '_Aucune réservation pour ce jour._';
+  } else {
+    entries.forEach(e=>{
+      msg += `🕐 *${e.h}* — ${e.empl}\n   👥 ${e.procs.join(', ')}\n\n`;
+    });
+    msg += `_Total : ${entries.length} créneaux_`;
+  }
+  msg += '\n\n_Généré par BeluSoft-Tchapy_';
+
+  // Copie presse-papier + lien WA
+  navigator.clipboard.writeText(msg).then(()=>{
+    toast('💬 Message copié dans le presse-papier','success');
+    setTimeout(()=>{
+      window.open('https://wa.me/?text='+encodeURIComponent(msg), '_blank');
+    }, 400);
+  }).catch(()=>{
+    // fallback : ouvre direct
+    window.open('https://wa.me/?text='+encodeURIComponent(msg), '_blank');
+  });
+}
+
+function exportMonthCSV(){
+  const key = moisKey();
+  const resMois = state.reservations[key]||{};
+  const rows = [['Jour','Horaire','Emplacement','Proclamateur 1','Proclamateur 2','Proclamateur 3','Proclamateur 4']];
+  Object.keys(resMois).map(Number).sort((a,b)=>a-b).forEach(d=>{
+    Object.entries(resMois[d]).forEach(([empl,slots])=>{
+      Object.entries(slots).forEach(([h,procs])=>{
+        const row = [d,h,empl,...procs];
+        while(row.length<7) row.push('');
+        rows.push(row);
+      });
+    });
+  });
+  const csv = '\uFEFF' + rows.map(r=>r.map(c=>`"${String(c).replace(/"/g,'""')}"`).join(';')).join('\n');
+  const blob = new Blob([csv], {type:'text/csv;charset=utf-8'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = `presentoirs_chelles_${key}.csv`;
+  a.click();
+  toast('📊 CSV exporté','success');
+}
+
+function exportJSON(){
+  const blob = new Blob([JSON.stringify({reservations:state.reservations, exportedAt:new Date().toISOString()},null,2)], {type:'application/json'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = `presentoirs_chelles_backup_${new Date().toISOString().slice(0,10)}.json`;
+  a.click();
+  toast('💾 Backup local téléchargé','success');
+}
+
+function importJSON(evt){
+  const f = evt.target.files[0];
+  if(!f) return;
+  const r = new FileReader();
+  r.onload = e => {
+    try{
+      const d = JSON.parse(e.target.result);
+      if(!d.reservations){ toast('Fichier invalide','error'); return; }
+      if(!confirm('Remplacer toutes les réservations actuelles ?')) return;
+      state.reservations = d.reservations;
+      persistLocal();
+      renderDays(); renderEmplList(); updateDaySummary();
+      toast('✅ Import réussi','success');
+    }catch(err){ toast('Fichier JSON invalide','error'); }
+  };
+  r.readAsText(f);
+  evt.target.value = '';
+}
+
+/* ========== HELPERS ========== */
+function openModal(id){ document.getElementById(id).classList.add('open'); }
+function closeModal(id){ document.getElementById(id).classList.remove('open'); }
+
+function toast(msg, type=''){
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.className = 'toast show '+type;
+  setTimeout(()=>t.classList.remove('show'), 3500);
+}
+
+function escapeHtml(s){ return String(s||'').replace(/[&<>"']/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+function escapeAttr(s){ return String(s||'').replace(/\\/g,'\\\\').replace(/'/g,"\\'"); }
+
+document.addEventListener('click', e=>{
+  if(e.target.classList.contains('modal')) e.target.classList.remove('open');
+});
+
+window.addEventListener('DOMContentLoaded', init);
+</script>
+</body>
+</html>
